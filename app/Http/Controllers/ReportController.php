@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Exports\ArrayExport;
 
 class ReportController extends Controller
 {
@@ -49,13 +52,13 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                        $query->whereDate("fecha", ">=", $inicio)
-                            ->whereDate("fecha", "<=", $fin)
-                            ->whereNotNull("febos_id");
-                    })
-                    ->orderBy("created_at")
-                    ->get();
+                                       ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                           $query->whereDate("fecha", ">=", $inicio)
+                                                 ->whereDate("fecha", "<=", $fin)
+                                                 ->whereNotNull("febos_id");
+                                       })
+                                       ->orderBy("created_at")
+                                       ->get();
                 $reqEmpresas->load("guiasDespacho");
                 $requerimientos->push($reqEmpresas);
             }
@@ -63,25 +66,25 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
-                ->orderBy("created_at")
-                ->get();
+                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                $query->whereDate("fecha", ">=", $inicio)
+                                      ->whereDate("fecha", "<=", $fin)
+                                      ->whereNotNull("febos_id");
+                            })
+                            ->orderBy("created_at")
+                            ->get();
             $requerimientos->load("guiasDespacho");
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
-                ->orderBy("created_at")
-                ->get();
+                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                $query->whereDate("fecha", ">=", $inicio)
+                                      ->whereDate("fecha", "<=", $fin)
+                                      ->whereNotNull("febos_id");
+                            })
+                            ->orderBy("created_at")
+                            ->get();
             $requerimientos->load("guiasDespacho");
         }
 
@@ -91,32 +94,36 @@ class ReportController extends Controller
             return $carry + $requerimiento->getTotal();
         });
 
-        $csv = fopen(storage_path("reporte-pack-$inicio-al-$fin.csv"), "w");
-
-        fputcsv($csv, [
-            'Periodo Inicio', 'Periodo Fin', 'Total Ventas ($)',
-            'Numero de Pedidos'
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            $inicio, $fin, $totalGasto,
-            $nroRequerimientos
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            'Fecha', 'Bodega Origen', 'Tratamiento',
-            'Zona', 'Destino', 'Empresa', 'N° Guia',
-            'SKU', 'Producto', 'Cantidad', 'P. Unitario',
-            'Total', 'Observaciones'
-        ]);
+        $excelData = [
+            [
+                'Periodo Inicio',
+                'Periodo Fin',
+                'Total Ventas ($)',
+                'Numero de Pedidos'
+            ],
+            [
+                $inicio,
+                $fin,
+                $totalGasto,
+                $nroRequerimientos
+            ],
+            [""],
+            [
+                'Fecha',
+                'Bodega Origen',
+                'Tratamiento',
+                'Zona',
+                'Destino',
+                'Empresa',
+                'N° Guia',
+                'SKU',
+                'Producto',
+                'Cantidad',
+                'P. Unitario',
+                'Total',
+                'Observaciones'
+            ]
+        ];
 
         if ($requerimientos->count() > 0) {
             foreach ($requerimientos as $requerimiento) {
@@ -124,7 +131,7 @@ class ReportController extends Controller
                     foreach ($requerimiento->guiasDespacho as $guiaDespacho) {
                         if ($guiaDespacho->productos->count() > 0) {
                             foreach ($guiaDespacho->productos as $producto) {
-                                fputcsv($csv, [
+                                $excelData[] =[
                                     date("d-m-Y", strtotime($guiaDespacho->created_at)),
                                     'PTO MONTT',
                                     'VTA',
@@ -138,7 +145,7 @@ class ReportController extends Controller
                                     $producto->pivot->precio,
                                     $producto->pivot->precio * $producto->pivot->real,
                                     $requerimiento->observaciones
-                                ]);
+                                ];
                             }
                         }
                     }
@@ -146,8 +153,8 @@ class ReportController extends Controller
             }
         }
 
-
-        return response()->download(storage_path("reporte-pack-$inicio-al-$fin.csv"))->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "reporte-pack-$inicio-al-$fin.xlsx");
     }
 
     /**
@@ -171,13 +178,13 @@ class ReportController extends Controller
         })->toArray();
 
         $requerimientos = \App\Requerimiento::whereIn("centro_id", $ids)
-            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                $query->whereDate("fecha", ">=", $inicio)
-                    ->whereDate("fecha", "<=", $fin)
-                    ->whereNotNull("febos_id");
-            })
-            ->orderBy("created_at")
-            ->get();
+                        ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                            $query->whereDate("fecha", ">=", $inicio)
+                                  ->whereDate("fecha", "<=", $fin)
+                                  ->whereNotNull("febos_id");
+                        })
+                        ->orderBy("created_at")
+                        ->get();
         $requerimientos->load("guiasDespacho");
 
 
@@ -187,31 +194,22 @@ class ReportController extends Controller
             return $carry + $requerimiento->getTotal();
         });
 
-        $csv = fopen(storage_path("$inicio-$fin.csv"), "w");
-
-        fputcsv($csv, [
-            'Periodo Inicio', 'Periodo Fin', 'Total Ventas ($)',
-            'Numero de Pedidos'
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            $inicio, $fin, $totalGasto,
-            $nroRequerimientos
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            "Zona", "Centro", "# Pedido", "Fecha Guia",
-            "Folio Guia", "Monto Guia", "Monto Rechazado",
-            "Diferencia", "Fecha Despacho", "Fecha Recepcion"
-        ]);
+        $excelData = [
+            [
+                'Periodo Inicio', 'Periodo Fin', 'Total Ventas ($)',
+                'Numero de Pedidos'
+            ],
+            [
+                $inicio, $fin, $totalGasto,
+                $nroRequerimientos
+            ],
+            [""],
+            [
+                "Zona", "Centro", "# Pedido", "Fecha Guia",
+                "Folio Guia", "Monto Guia", "Monto Rechazado",
+                "Diferencia", "Fecha Despacho", "Fecha Recepcion"
+            ],
+        ];
 
         if ($requerimientos->count() > 0) {
             foreach ($requerimientos as $requerimiento) {
@@ -221,7 +219,7 @@ class ReportController extends Controller
                         $observacion = $requerimiento->detalleEstado("RECIBIDO CON OBSERVACIONES")->created_at;
                         $fechaRecepcion = empty($recibido) ? $observacion : $recibido;
                         $fechaRecepcion = empty($fechaRecepcion) ? "Sin Recibir" : $fechaRecepcion;
-                        fputcsv($csv, [
+                        $excelData[] = [
                             $guiaDespacho->direccion_destino,
                             $guiaDespacho->nombre_centro,
                             $guiaDespacho->requerimiento_id,
@@ -232,23 +230,23 @@ class ReportController extends Controller
                             $guiaDespacho->neto - $guiaDespacho->montoRechazado,
                             $requerimiento->detalleEstado("DESPACHADO")->created_at,
                             $fechaRecepcion
-                        ]);
+                        ];
 
                         if ($guiaDespacho->rechazos->count() > 0) {
-                            fputcsv($csv, [
+                            $excelData[] = [
                                 "", "", "", "", "",
                                 "Rechazado", "Precio", "Despachado",
                                 "Subtotal", "Motivo Rechazo"
-                            ]);
+                            ];
                             foreach ($guiaDespacho->rechazos as $rechazo) {
-                                fputcsv($csv, [
+                                $excelData[] = [
                                     $rechazo->producto->detalle,
                                     $rechazo->producto->venta,
                                     $rechazo->productoGuia->real,
                                     $rechazo->productoGuia->real
-                                        * $rechazo->producto->venta,
+                                    * $rechazo->producto->venta,
                                     $rechazo->motivo
-                                ]);
+                                ];
                             }
                         }
                     }
@@ -257,9 +255,8 @@ class ReportController extends Controller
         }
 
 
-        return response()
-            ->download(storage_path("$inicio-$fin.csv"))
-            ->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "$inicio-$fin.xlsx");
     }
 
     /**
@@ -314,13 +311,13 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                        $query->whereDate("fecha", ">=", $inicio)
-                            ->whereDate("fecha", "<=", $fin)
-                            ->whereNotNull("febos_id");
-                    })
-                    ->orderBy("created_at")
-                    ->get();
+                                       ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                           $query->whereDate("fecha", ">=", $inicio)
+                                                 ->whereDate("fecha", "<=", $fin)
+                                                 ->whereNotNull("febos_id");
+                                       })
+                                       ->orderBy("created_at")
+                                       ->get();
                 $reqEmpresas->load("guiasDespacho", "guiasDespacho.productos");
                 $requerimientos->push($reqEmpresas);
             }
@@ -328,25 +325,25 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
-                ->orderBy("created_at")
-                ->get();
+                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                $query->whereDate("fecha", ">=", $inicio)
+                                      ->whereDate("fecha", "<=", $fin)
+                                      ->whereNotNull("febos_id");
+                            })
+                            ->orderBy("created_at")
+                            ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
-                ->orderBy("created_at")
-                ->get();
+                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                $query->whereDate("fecha", ">=", $inicio)
+                                      ->whereDate("fecha", "<=", $fin)
+                                      ->whereNotNull("febos_id");
+                            })
+                            ->orderBy("created_at")
+                            ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         }
 
@@ -360,9 +357,9 @@ class ReportController extends Controller
     public function rebajaView()
     {
         $productos = \DB::table("productos")
-            ->select("sku", "detalle")
-            ->groupBy("sku")
-            ->get();
+                   ->select("sku", "detalle")
+                   ->groupBy("sku")
+                   ->get();
 
         $empresas = \App\Empresa::all();
         $centros = \App\Centro::all();
@@ -390,29 +387,15 @@ class ReportController extends Controller
             $type = "ZONA";
         }
 
-
-        $csv = fopen(storage_path("reporte-rebaja.csv"), "w");
-
-        fputcsv($csv, [
-            'Periodo Inicio', 'Periodo Fin'
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            $inicio, $fin,
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
+        $excelData = [
+            ['Periodo Inicio', 'Periodo Fin'],
+            [$inicio, $fin],
+            [""],
+        ];
 
         $productos = \App\Producto::whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
             $query->where("fecha", ">=", $inicio)
-                ->where("fecha", "<=", $fin);
+                  ->where("fecha", "<=", $fin);
         });
 
         if (!empty($skus)) {
@@ -422,29 +405,34 @@ class ReportController extends Controller
         $productos = $productos->groupBy("sku")->get();
 
         if ($productos->count() > 0) {
-            fputcsv($csv, [
+            $excelData[] = [
                 'Total por Productos:'
-            ]);
-            fputcsv($csv, [
-                'SKU', 'DETALLE', 'SOLICITADO', 'DESPACHADO', 'TOTAL'
-            ]);
+            ];
+            $excelData[] = ['SKU', 'DETALLE', 'SOLICITADO', 'DESPACHADO', 'TOTAL'];
             foreach ($productos as $producto) {
                 $cantidad = $producto->getDetalleGuia($inicio, $fin, $ids, $type);
-
-                fputcsv($csv, [
-                    $producto->sku, $producto->detalle, $cantidad["CANTIDAD"],
-                    $cantidad["REAL"], $cantidad["SUBTOTAL"]
-                ]);
+                $excelData[] = [
+                    $producto->sku,
+                    $producto->detalle,
+                    $cantidad["CANTIDAD"],
+                    $cantidad["REAL"],
+                    $cantidad["SUBTOTAL"]
+                ];
             }
 
-            fputcsv($csv, [
-                ''
-            ]);
+            $excelData[] = [""];
+            $excelData[] =[
+                'FECHA',
+                'ZONA',
+                'DESTINO',
+                'EMPRESA',
+                'N° GUIA',
+                'PRODUCTO',
+                'CANTIDAD',
+                'P. UNITARIO',
+                'TOTAL'
+            ];
 
-            fputcsv($csv, [
-                'FECHA', 'ZONA', 'DESTINO', 'EMPRESA', 'N° GUIA',
-                'PRODUCTO', 'CANTIDAD', 'P. UNITARIO', 'TOTAL'
-            ]);
 
             foreach ($productos as $producto) {
 
@@ -458,26 +446,26 @@ class ReportController extends Controller
                 );
 
                 switch ($type) {
-                    case "EMPRESA":
-                        $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
-                            return $ids->contains($guia->empresaId);
-                        });
-                        break;
-                    case "CENTRO":
-                        $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
-                            return $ids->contains($guia->centroId);
-                        });
-                        break;
-                    case "ZONA":
-                        $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
-                            return $ids->contains($guia->zonaId);
-                        });
-                        break;
+                case "EMPRESA":
+                    $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
+                        return $ids->contains($guia->empresaId);
+                    });
+                    break;
+                case "CENTRO":
+                    $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
+                        return $ids->contains($guia->centroId);
+                    });
+                    break;
+                case "ZONA":
+                    $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
+                        return $ids->contains($guia->zonaId);
+                    });
+                    break;
                 }
 
                 if ($guiasDespacho->count() > 0) {
                     foreach ($guiasDespacho as $guia) {
-                        fputcsv($csv, [
+                        $excelData[] = [
                             date("d-m-Y", strtotime($guia->created_at)),
                             $guia->requerimiento->centro->zona ?? "No Encontrado",
                             $guia->requerimiento->centro->nombre ?? "No Encontrado",
@@ -487,14 +475,15 @@ class ReportController extends Controller
                             $guia->pivot->real,
                             $guia->pivot->precio,
                             $guia->pivot->precio * $guia->pivot->real,
-                        ]);
+                        ];
                     }
                 }
             }
         }
 
 
-        return response()->download(storage_path("reporte-rebaja.csv"))->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "rebaja-$inicio-$fin.xlsx");
     }
 
     public function estadoPagoView()
@@ -519,13 +508,13 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                        $query->whereDate("fecha", ">=", $inicio)
-                            ->whereDate("fecha", "<=", $fin)
-                            ->whereNotNull("febos_id");
-                    })
-                    ->orderBy("created_at")
-                    ->get();
+                                       ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                           $query->whereDate("fecha", ">=", $inicio)
+                                                 ->whereDate("fecha", "<=", $fin)
+                                                 ->whereNotNull("febos_id");
+                                       })
+                                       ->orderBy("created_at")
+                                       ->get();
                 $reqEmpresas->load("guiasDespacho", "guiasDespacho.productos");
                 $requerimientos->push($reqEmpresas);
             }
@@ -533,61 +522,42 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
-                ->orderBy("created_at")
-                ->get();
+                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                $query->whereDate("fecha", ">=", $inicio)
+                                      ->whereDate("fecha", "<=", $fin)
+                                      ->whereNotNull("febos_id");
+                            })
+                            ->orderBy("created_at")
+                            ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
-                ->orderBy("created_at")
-                ->get();
+                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                $query->whereDate("fecha", ">=", $inicio)
+                                      ->whereDate("fecha", "<=", $fin)
+                                      ->whereNotNull("febos_id");
+                            })
+                            ->orderBy("created_at")
+                            ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         }
 
-        $csv = fopen(storage_path("reporte-pagos.csv"), "w");
-
-        fputcsv($csv, [
-            'Periodo Inicio', 'Periodo Fin'
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            $inicio, $fin,
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            'Fecha', 'Folio', 'Empresa', 'Centro',
-            'Zona', 'Cant. Productos', 'Total'
-        ]);
-
-
+        $excelData = [
+            ['Periodo Inicio', 'Periodo Fin'],
+            [$inicio, $fin],
+            [""],
+            [
+                'Fecha', 'Folio', 'Empresa', 'Centro',
+                'Zona', 'Cant. Productos', 'Total'
+            ],
+        ];
         if ($requerimientos->count() > 0) {
             foreach ($requerimientos as $requerimiento) {
                 if ($requerimiento->guiasDespacho->count() > 0) {
                     foreach ($requerimiento->guiasDespacho as $guiaDespacho) {
-                        fputcsv($csv, [
+                        $excelData[] = [
                             date("d-m-Y", strtotime($guiaDespacho->created_at)),
                             $guiaDespacho->folio,
                             $guiaDespacho->requerimiento->centro->empresa->razon_social,
@@ -595,14 +565,16 @@ class ReportController extends Controller
                             $guiaDespacho->requerimiento->centro->zona,
                             $guiaDespacho->productos->count(),
                             $guiaDespacho->neto
-                        ]);
+                        ];
                     }
                 }
             }
         }
 
 
-        return response()->download(storage_path("reporte-pagos.csv"))->deleteFileAfterSend();
+
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "reporte-pagos.xlsx");
     }
 
     public function enviadosView()
@@ -622,13 +594,13 @@ class ReportController extends Controller
         })->toArray();
 
         $requerimientos = \App\Requerimiento::whereIn("centro_id", $ids)
-            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                $query->whereDate("fecha", ">=", $inicio)
-                    ->whereDate("fecha", "<=", $fin);
-                //->whereNotNull("febos_id");
-            })
-            ->orderBy("created_at")
-            ->get();
+                        ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                            $query->whereDate("fecha", ">=", $inicio)
+                                  ->whereDate("fecha", "<=", $fin)
+                                  ->whereNotNull("febos_id");
+                        })
+                        ->orderBy("created_at")
+                        ->get();
         $requerimientos->load("guiasDespacho");
 
         $nroRequerimientos = $requerimientos->count();
@@ -637,39 +609,29 @@ class ReportController extends Controller
             return $carry + $requerimiento->getTotal();
         });
 
-        $csv = fopen(storage_path("$inicio-$fin.csv"), "w");
-
-        fputcsv($csv, [
-            'Periodo Inicio', 'Periodo Fin', 'Total Ventas ($)',
-            'Numero de Pedidos'
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            $inicio, $fin, $totalGasto,
-            $nroRequerimientos
-        ]);
-
-        fputcsv($csv, [
-            ''
-        ]);
-
-        fputcsv($csv, [
-            'Fecha', 'Zona', 'Destino', 'N° Guia',
-            'SKU', 'Producto', 'Cantidad', 'P. Unitario',
-            'Total', 'Observaciones'
-        ]);
-
+        $excelData = [
+            [
+                'Periodo Inicio', 'Periodo Fin', 'Total Ventas ($)',
+                'Numero de Pedidos'
+            ],
+            [
+                $inicio, $fin, $totalGasto,
+                $nroRequerimientos
+            ],
+            [""],
+            [
+                'Fecha', 'Zona', 'Destino', 'N° Guia',
+                'SKU', 'Producto', 'Cantidad', 'P. Unitario',
+                'Total', 'Observaciones'
+            ],
+        ];
         if ($requerimientos->count() > 0) {
             foreach ($requerimientos as $requerimiento) {
                 if ($requerimiento->guiasDespacho->count() > 0) {
                     foreach ($requerimiento->guiasDespacho as $guiaDespacho) {
                         if ($guiaDespacho->productos->count() > 0) {
                             foreach ($guiaDespacho->productos as $producto) {
-                                fputcsv($csv, [
+                                $excelData[] = [
                                     date("d-m-Y", strtotime($guiaDespacho->created_at)),
                                     $requerimiento->centro->zona,
                                     $requerimiento->centro->nombre,
@@ -680,7 +642,7 @@ class ReportController extends Controller
                                     $producto->pivot->precio,
                                     $producto->pivot->precio * $producto->pivot->real,
                                     $requerimiento->observaciones
-                                ]);
+                                ];
                             }
                         }
                     }
@@ -688,9 +650,8 @@ class ReportController extends Controller
             }
         }
 
-        return response()
-            ->download(storage_path("$inicio-$fin.csv"))
-            ->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "$inicio-$fin.xlsx");
     }
 
     public function recibidosView()
@@ -707,22 +668,22 @@ class ReportController extends Controller
         
 
         $requerimientos = $empresa->requerimientos()
-            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                $query->whereDate("fecha", ">=", $inicio)
-                    ->whereDate("fecha", "<=", $fin);
-                //->whereNotNull("febos_id");
-            })
-            ->orderBy("created_at")
-            ->get();
+                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                      $query->whereDate("fecha", ">=", $inicio)
+                                            ->whereDate("fecha", "<=", $fin)
+                                            ->whereNotNull("febos_id");
+                                  })
+                                  ->orderBy("created_at")
+                                  ->get();
         $requerimientos->load("guiasDespacho");
-        
-        $csv = fopen(storage_path("$inicio-$fin.csv"), "w");
 
-        fputcsv($csv, [
-            "Zona", "Centro", "# Pedido", "Fecha Guia",
-            "Folio Guia", "Detalle", "Precio Unt", "Cantidad",
-            "Subtotal", "Motivo Rechazo", "Observacion Compass"
-        ]);
+        $excelData = [
+            [
+                "Zona", "Centro", "# Pedido", "Fecha Guia",
+                "Folio Guia", "Detalle", "Precio Unt", "Cantidad",
+                "Subtotal", "Motivo Rechazo", "Observacion Compass"
+            ],
+        ];
 
         if ($requerimientos->count() > 0) {
             foreach ($requerimientos as $requerimiento) {
@@ -730,7 +691,7 @@ class ReportController extends Controller
                     foreach ($requerimiento->guiasDespacho as $guiaDespacho) {
                         if ($guiaDespacho->rechazos->count() > 0) {
                             foreach ($guiaDespacho->rechazos as $rechazo) {
-                                fputcsv($csv, [
+                                $excelData[] = [
                                     $requerimiento->centro->zona,
                                     $requerimiento->centro->nombre,
                                     $requerimiento->id,
@@ -740,10 +701,10 @@ class ReportController extends Controller
                                     $rechazo->producto->venta,
                                     $rechazo->productoGuia->pivot->real,
                                     $rechazo->producto->venta
-                                        * $rechazo->productoGuia->pivot->real,
+                                    * $rechazo->productoGuia->pivot->real,
                                     $rechazo->motivo,
                                     $rechazo->productoGuia->observacion
-                                ]);
+                                ];
                             }
                         }
                     }
@@ -752,9 +713,8 @@ class ReportController extends Controller
         }
 
 
-        return response()
-            ->download(storage_path("$inicio-$fin.csv"))
-            ->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "$inicio-$fin.xlsx");
     }
 
     public function cierresView()
@@ -770,23 +730,23 @@ class ReportController extends Controller
         $empresa = Auth::user()->userable;
 
         $requerimientos = $empresa->requerimientos()
-            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                $query->whereDate("fecha", ">=", $inicio)
-                    ->whereDate("fecha", "<=", $fin);
-                //->whereNotNull("febos_id");
-            })
-            ->orderBy("created_at")
-            ->get();
+                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                      $query->whereDate("fecha", ">=", $inicio)
+                                            ->whereDate("fecha", "<=", $fin)
+                                            ->whereNotNull("febos_id");
+                                  })
+                                  ->orderBy("created_at")
+                                  ->get();
         $requerimientos->load("guiasDespacho");
 
-        $csv = fopen(storage_path("$inicio-$fin.csv"), "w");
-
-        fputcsv($csv, [
-            "Zona", "Centro", "# Pedido", "Fecha Guia",
-            "Folio Guia", "Monto Guia", "Monto Rechazado",
-            "Diferencia", "Fecha Despacho", "Fecha Recepcion",
-            "Observaciones"
-        ]);
+        $excelData = [
+            [
+                "Zona", "Centro", "# Pedido", "Fecha Guia",
+                "Folio Guia", "Monto Guia", "Monto Rechazado",
+                "Diferencia", "Fecha Despacho", "Fecha Recepcion",
+                "Observaciones"
+            ],
+        ];
 
         if ($requerimientos->count() > 0) {
             foreach ($requerimientos as $requerimiento) {
@@ -795,20 +755,20 @@ class ReportController extends Controller
                         $recibido = null;
                         if (!empty($requerimiento->detalleEstado("RECIBIDO"))) {
                             $recibido = $requerimiento
-                                ->detalleEstado("RECIBIDO")
-                                ->created_at;
+                                      ->detalleEstado("RECIBIDO")
+                                      ->created_at;
                         }
                         $observacion = null;
                         if (!empty($requerimiento->detalleEstado("RECIBIDO CON OBSERVACIONES"))) {
                             $observacion = $requerimiento
-                                ->detalleEstado("RECIBIDO CON OBSERVACIONES")
-                                ->created_at;
+                                         ->detalleEstado("RECIBIDO CON OBSERVACIONES")
+                                         ->created_at;
                         }
                         $fechaRecepcion = empty($recibido) ? $observacion : $recibido;
                         $fechaRecepcion = empty($fechaRecepcion) ? "SIN RECIBIR" : $fechaRecepcion;
                         $hasObservacion = ($guiaDespacho->rechazos->count() > 0) ? "SI" : "NO";
 
-                        fputcsv($csv, [
+                        $excelData[] = [
                             $guiaDespacho->direccion_destino,
                             $guiaDespacho->nombre_centro,
                             $guiaDespacho->requerimiento_id,
@@ -820,15 +780,14 @@ class ReportController extends Controller
                             $guiaDespacho->fecha,
                             $fechaRecepcion,
                             $hasObservacion
-                        ]);
+                        ];
                     }
                 }
             }
         }
 
-        return response()
-            ->download(storage_path("$inicio-$fin.csv"))
-            ->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "$inicio-$fin.xlsx");
     }
 
     public function notaCreditoView()
@@ -844,33 +803,33 @@ class ReportController extends Controller
         $empresa = Auth::user()->userable;
 
         $requerimientos = $empresa->requerimientos()
-            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                $query->whereDate("fecha", ">=", $inicio)
-                    ->whereDate("fecha", "<=", $fin);
-                //->whereNotNull("febos_id");
-            })
-            ->orderBy("created_at")
-            ->get();
+                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                      $query->whereDate("fecha", ">=", $inicio)
+                                            ->whereDate("fecha", "<=", $fin)
+                                            ->whereNotNull("febos_id");
+                                  })
+                                  ->orderBy("created_at")
+                                  ->get();
         $requerimientos->load("productosRechazados");
 
         $rechazos = $requerimientos
-            ->pluck("productosRechazados")
-            ->flatten()
-            ->filter(function ($rechazo) {
-                return $rechazo->estado_pago && $rechazo->cierre;
-            });
+                  ->pluck("productosRechazados")
+                  ->flatten()
+                  ->filter(function ($rechazo) {
+                      return $rechazo->estado_pago && $rechazo->cierre;
+                  });
 
-        $csv = fopen(storage_path("$inicio-$fin.csv"), "w");
-
-        fputcsv($csv, [
-            "Zona", "Centro", "# Pedido", "Fecha Guia",
-            "Folio Guia", "Detalle", "Precio Unt", "Cantidad",
-            "Subtotal", "Motivo Rechazo", "Observacion Compass"
-        ]);
+        $excelData = [
+            [
+                "Zona", "Centro", "# Pedido", "Fecha Guia",
+                "Folio Guia", "Detalle", "Precio Unt", "Cantidad",
+                "Subtotal", "Motivo Rechazo", "Observacion Compass"
+            ]
+        ];
 
         if ($rechazos->count() > 0) {
             foreach ($rechazos as $rechazo) {
-                fputcsv($csv, [
+                $excelData[] = [
                     $rechazo->guiaDespacho->direccion_destino,
                     $rechazo->guiaDespacho->nombre_centro,
                     $rechazo->guiaDespacho->requerimiento->id,
@@ -880,16 +839,16 @@ class ReportController extends Controller
                     $rechazo->producto->venta,
                     $rechazo->productoGuia->pivot->real,
                     $rechazo->producto->venta *
-                        $rechazo->productoGuia->pivot->real,
+                    $rechazo->productoGuia->pivot->real,
                     $rechazo->motivo,
                     $rechazo->productoGuia->pivot->observacion
-                ]);
+                ];
+                f;
             }
         }
 
-        return response()
-            ->download(storage_path("$inicio-$fin.csv"))
-            ->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "$inicio-$fin.xlsx");
     }
 
     public function cargaEmpresaView()
@@ -905,33 +864,33 @@ class ReportController extends Controller
         $empresa = Auth::user()->userable;
 
         $requerimientos = $empresa->requerimientos()
-            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                $query->whereDate("fecha", ">=", $inicio)
-                    ->whereDate("fecha", "<=", $fin);
-                //->whereNotNull("febos_id");
-            })
-            ->orderBy("created_at")
-            ->get();
+                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                                      $query->whereDate("fecha", ">=", $inicio)
+                                            ->whereDate("fecha", "<=", $fin);
+                                      //->whereNotNull("febos_id");
+                                  })
+                                  ->orderBy("created_at")
+                                  ->get();
         $requerimientos->load("productosRechazados");
 
         $rechazos = $requerimientos
-            ->pluck("productosRechazados")
-            ->flatten()
-            ->filter(function ($rechazo) {
-                return !$rechazo->estado_pago && $rechazo->cierre;
-            });
+                  ->pluck("productosRechazados")
+                  ->flatten()
+                  ->filter(function ($rechazo) {
+                      return !$rechazo->estado_pago && $rechazo->cierre;
+                  });
 
-        $csv = fopen(storage_path("$inicio-$fin.csv"), "w");
-
-        fputcsv($csv, [
-            "Zona", "Centro", "# Pedido", "Fecha Guia",
-            "Folio Guia", "Detalle", "Precio Unt", "Cantidad",
-            "Subtotal", "Motivo Rechazo", "Observacion Compass"
-        ]);
+        $excelData = [
+            [
+                "Zona", "Centro", "# Pedido", "Fecha Guia",
+                "Folio Guia", "Detalle", "Precio Unt", "Cantidad",
+                "Subtotal", "Motivo Rechazo", "Observacion Compass"
+            ]
+        ];
 
         if ($rechazos->count() > 0) {
             foreach ($rechazos as $rechazo) {
-                fputcsv($csv, [
+                $excelData[] = [
                     $rechazo->guiaDespacho->direccion_destino,
                     $rechazo->guiaDespacho->nombre_centro,
                     $rechazo->guiaDespacho->requerimiento->id,
@@ -941,15 +900,14 @@ class ReportController extends Controller
                     $rechazo->producto->venta,
                     $rechazo->productoGuia->pivot->real,
                     $rechazo->producto->venta *
-                        $rechazo->productoGuia->pivot->real,
+                    $rechazo->productoGuia->pivot->real,
                     $rechazo->motivo,
                     $rechazo->productoGuia->pivot->observacion
-                ]);
+                ];
             }
         }
 
-        return response()
-            ->download(storage_path("$inicio-$fin.csv"))
-            ->deleteFileAfterSend();
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "$inicio-$fin.xlsx");
     }
 }
