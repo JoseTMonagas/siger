@@ -74,11 +74,11 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('habilitar/centro/{centro}', 'CentroController@habilitar')->name('centros.habilitar');
     Route::get('estado/centro/{centro}', 'CentroController@habilitarForm')->name('centros.habilitar.get');
-    
+
     Route::get(
-                "observaciones/{requerimiento}",
-                "RechazoController@show"
-            )->name("rechazos.show");
+        "observaciones/{requerimiento}",
+        "RechazoController@show"
+    )->name("rechazos.show");
 
     // Rutas del Cliente
     Route::group(['prefix' => 'cliente', 'middleware' => ['cliente']], function () {
@@ -103,7 +103,7 @@ Route::group(['middleware' => 'auth'], function () {
                 )->name('pedidos.recepcion.post');
             });
 
-            
+
 
             Route::group(['middleware' => ['type:\App\Empresa']], function () {
                 Route::get('validar-pedidos', 'RequerimientoController@validarPedidos')->name('pedidos.validar');
@@ -275,6 +275,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('cargar-folios', 'FolioController@store')->name('folios.store');
 
         Route::post('requerimiento/{requerimiento}/productos/agregar', 'RequerimientoController@agregarProductos')->name('requerimiento.productos.agregar');
+        Route::delete('requerimiento/{requerimiento}', 'RequerimientoController@eliminar')->name('requerimiento.eliminar');
         Route::get('reemplazar-producto/{requerimiento}/{producto}', 'RequerimientoController@cambiarProducto')->name('cajas.cambiar');
         Route::put('reemplazar-producto/{requerimiento}', 'RequerimientoController@reemplazar')->name('cajas.reemplazar');
         Route::get('borrar-producto/{requerimiento}/{producto}', 'RequerimientoController@borrarProducto')->name('cajas.borrar');

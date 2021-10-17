@@ -752,4 +752,12 @@ class RequerimientoController extends Controller
 
         return back();
     }
+
+    public function eliminar(Requerimiento $requerimiento)
+    {
+        $requerimiento->estado = "ELIMINADO";
+        $requerimiento->save();
+
+        return back();
+    }
 }
