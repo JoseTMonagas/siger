@@ -423,6 +423,20 @@ class RequerimientoController extends Controller
      */
     public function armarCaja(Request $request, \App\Requerimiento $requerimiento)
     {
+        if ($request->has("delete") && $request->input("remove")) {
+            $requerimiento->productos()->detach($request->input("remove"));
+
+            $msg = [
+                'meta' => [
+                    'title' => 'Eliminados',
+                ]
+            ];
+
+            return redirect()
+                ->back()
+                ->with(compact('msg'));
+        }
+
         $requerimiento = \App\Requerimiento::find($requerimiento->id);
         $productos = collect($request->input('productos'));
         $reales = collect($request->input('real'));
@@ -484,20 +498,17 @@ class RequerimientoController extends Controller
                     ->route('compass.pedidos.cajasIndex')
                     ->with(compact('msg'));
             }
-
         }
 
-                $msg = [
-                    'meta' => [
-                        'title' => 'Guardado',
-                    ]
-                ];
+        $msg = [
+            'meta' => [
+                'title' => 'Guardado',
+            ]
+        ];
 
-                return redirect()
-                    ->back()
-                    ->with(compact('msg'));
-
-
+        return redirect()
+            ->back()
+            ->with(compact('msg'));
     }
 
     /**

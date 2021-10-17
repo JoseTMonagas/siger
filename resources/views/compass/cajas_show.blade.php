@@ -67,12 +67,13 @@
                   </div>
                 </div>
                 <div class="row mt-4">
-                  <div class="col-md-2">
+                  <div class="col-md-3">
                     <agregar-producto-caja :productos='@json($productos)' action="{{ route('requerimiento.productos.agregar', $requerimiento) }}"></agregar-producto-caja>
                   </div>
-                  <div class="col-md-2 offset-md-4">
+                  <div class="col-md-4 offset-md-1">
                     <button type="submit" name="save" value="1" class="btn btn-info">Guardar</button>
                     <button type="submit" name="save" value="0" class="btn btn-success">Armar</button>
+                    <button type="submit" name="delete" value="1" class="btn btn-danger">Eliminar Seleccionados</button>
                   </div>
                 </div>
               </div>
@@ -82,6 +83,7 @@
         <table id="datatable-requerimiento" class="table">
           <thead>
             <tr>
+              <th scope="col">Seleccionar</th>
               <th scope="col">SKU</th>
               <th scope="col">Detalle</th>
               <th scope="col">Cantidad Solicitada</th>
@@ -94,6 +96,7 @@
           <tbody>
             @foreach ($requerimiento->productos as $producto)
             <tr>
+              <td><input type="checkbox" name="remove[]" value="{{$producto->id}}" /></td>
               <input type="hidden" value="{{$producto}}" name="productos[]" />
               <td>{{$producto->sku}}</td>
               <td>{{$producto->detalle}}</td>
