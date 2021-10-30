@@ -97,6 +97,7 @@
         <a class="dropdown-item" href="{{route('reportes.productos')}}">Rebaja de Productos</a>
         <a class="dropdown-item" href="{{route('reportes.estadoPago')}}">Estados de Pago</a>
         <a class="dropdown-item" href="{{route('reportes.guias.view')}}">Historial de Guias de Despacho</a>
+        <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta Requerimiento</a>
     </div>
 </li>
 <li class="nav-item">

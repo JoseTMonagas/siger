@@ -3,21 +3,15 @@
     <v-stepper v-model="currentStep">
       <v-stepper-header>
         <v-stepper-step :complete="currentStep > 1" step="1">
-          <strong>
-            Paso 1: Descargar el formato
-          </strong>
+          <strong>Paso 1: Descargar el formato</strong>
         </v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step :complete="currentStep > 2" step="2">
-          <strong>
-            Paso 2: Cargar el formato
-          </strong>
+          <strong>Paso 2: Cargar el formato</strong>
         </v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step :complete="currentStep > 3" step="3">
-          <strong>
-            Paso 3: Confirmar Pedido
-          </strong>
+          <strong>Paso 3: Confirmar Pedido</strong>
         </v-stepper-step>
       </v-stepper-header>
       <v-stepper-items>
@@ -28,17 +22,14 @@
                 <v-btn
                   :color="validation.formato ? 'success' : 'warning'"
                   @click="makeExcelFile"
-                  >Descargar Formato</v-btn
-                >
+                >Descargar Formato</v-btn>
               </div>
             </div>
           </div>
 
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn color="primary" @click="validateStep(1)">
-                Continuar
-              </v-btn>
+              <v-btn color="primary" @click="validateStep(1)">Continuar</v-btn>
             </div>
           </div>
         </v-stepper-content>
@@ -46,12 +37,8 @@
           <div class="container">
             <div class="row justify-content-center">
               <div class="col-md-4">
-                <label for="">Ingrese el archivo excel (XLSX):</label>
-                <input
-                  class="form-control"
-                  type="file"
-                  @change="validateFile"
-                />
+                <label for>Ingrese el archivo excel (XLSX):</label>
+                <input class="form-control" type="file" @change="validateFile" />
               </div>
             </div>
             <div
@@ -72,14 +59,10 @@
           </div>
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn @click="currentStep = 1">
-                Regresar
-              </v-btn>
+              <v-btn @click="currentStep = 1">Regresar</v-btn>
             </div>
             <div class="col-md-2">
-              <v-btn color="primary" @click="validateStep(2)">
-                Continuar
-              </v-btn>
+              <v-btn color="primary" @click="validateStep(2)">Continuar</v-btn>
             </div>
           </div>
         </v-stepper-content>
@@ -128,18 +111,10 @@
                     <tbody>
                       <tr v-for="producto in fileProductos" :key="producto.sku">
                         <td>{{ producto.sku }}</td>
-                        <td>
-                          {{ getDetalleBySKU(producto.sku) }}
-                        </td>
-                        <td>
-                          {{ getVentaBySKU(producto.sku) }}
-                        </td>
-                        <td>
-                          {{ producto.cantidad }}
-                        </td>
-                        <td>
-                          {{ getVentaBySKU(producto.sku) * producto.cantidad }}
-                        </td>
+                        <td>{{ getDetalleBySKU(producto.sku) }}</td>
+                        <td>{{ getVentaBySKU(producto.sku) }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ getVentaBySKU(producto.sku) * producto.cantidad }}</td>
                       </tr>
                     </tbody>
                   </template>
@@ -165,13 +140,7 @@
 
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn
-                :loading="loading"
-                :disabled="loading"
-                @click="currentStep = 2"
-              >
-                Regresar
-              </v-btn>
+              <v-btn :loading="loading" :disabled="loading" @click="currentStep = 2">Regresar</v-btn>
             </div>
             <div class="col-md-2">
               <v-btn
@@ -179,9 +148,7 @@
                 :disabled="loading"
                 color="success"
                 @click="save"
-              >
-                Confirmar y Solicitar
-              </v-btn>
+              >Confirmar y Solicitar</v-btn>
             </div>
           </div>
         </v-stepper-content>
@@ -189,9 +156,7 @@
     </v-stepper>
     <aside class="row justify-content-around mt-4">
       <div class="col-md-6 alert alert-info">
-        <strong>
-          {{ context }}
-        </strong>
+        <strong>{{ context }}</strong>
       </div>
     </aside>
   </main>
@@ -204,32 +169,32 @@ export default {
   props: {
     formatoDownload: {
       type: String,
-      required: true
+      required: true,
     },
     productos: {
       type: Array,
-      required: true
+      required: true,
     },
     empresa: {
       type: Object,
-      required: true
+      required: true,
     },
     centro: {
       type: Object,
-      required: true
+      required: true,
     },
     nombreRequerimiento: {
       type: String,
-      required: true
+      required: true,
     },
     numeroRequerimiento: {
       type: String,
-      required: true
+      required: true,
     },
     storeRoute: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     totalRequerimiento() {
@@ -257,7 +222,7 @@ export default {
           return "Aqui puede confirmar los productos del requerimiento, en caso de que quiera cambiar alguna cantidad o producto puede Regresar al paso anterior y cargar de nuevo el formato excel; de estar todo correcto puede hacer la solicitud del requerimiento.";
           break;
       }
-    }
+    },
   },
   data() {
     return {
@@ -266,13 +231,13 @@ export default {
         formato: false,
         file: {
           status: false,
-          errors: []
-        }
+          errors: [],
+        },
       },
       fileProductos: [],
       fileExcel: null,
       isEditing: false,
-      loading: false
+      loading: false,
     };
   },
   methods: {
@@ -295,25 +260,25 @@ export default {
       const schema = {
         SKU: {
           prop: "sku",
-          type: value => {
+          type: (value) => {
             if (!this.validateSKU(value)) {
               throw new Error("SKU INVALIDO");
             } else {
               return value;
             }
-          }
+          },
         },
         CANTIDAD: {
           prop: "cantidad",
-          type: value => {
+          type: (value) => {
             const cantidad = parseFloat(value);
             if (cantidad === NaN || cantidad < 0) {
               throw new Error("CANTIDAD INVALIDA");
             } else {
               return cantidad;
             }
-          }
-        }
+          },
+        },
       };
       readXlsxFile(file, { schema }).then(({ rows, errors }) => {
         if (errors.length > 0) {
@@ -321,15 +286,15 @@ export default {
           this.validation.file.errors = errors;
         } else {
           this.validation.file.status = true;
-          this.fileProductos = rows.filter(row => row.cantidad > 0);
+          this.fileProductos = rows.filter((row) => row.cantidad > 0);
         }
       });
     },
     validateSKU(sku) {
-      return this.productos.some(producto => producto.sku == sku);
+      return this.productos.some((producto) => producto.sku == sku);
     },
     getProductoBySKU(sku) {
-      return this.productos.find(producto => producto.sku == sku);
+      return this.productos.find((producto) => producto.sku == sku);
     },
     getDetalleBySKU(sku) {
       const producto = this.getProductoBySKU(sku);
@@ -350,7 +315,7 @@ export default {
       this.loading = true;
       axios
         .post(this.storeRoute, { productos })
-        .catch(function(error) {
+        .catch(function (error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -370,7 +335,7 @@ export default {
           }
           this.loading = false;
         })
-        .then(resp => {
+        .then((resp) => {
           if (resp.status == 201) {
             alert("Guardado Exitosamente");
             this.loading = false;
@@ -384,27 +349,34 @@ export default {
         Title: "Productos Disponibles",
         Subject: "Requerimiento para Compass",
         Author: "Mline",
-        CreatedDate: new Date()
+        CreatedDate: new Date(),
       };
       wb.SheetNames.push("Productos");
+      const productos = this.productos.filter(
+        (producto) => !producto.reemplazo
+      );
       let rows = [
         [
           "SKU",
+          "FAMILIA",
           "DETALLE",
+          "MARCA",
           "P. UNIT",
           "CANTIDAD",
           "SUBTOTAL",
           "TOTAL=",
-          { f: "=SUMA(E:E)" }
-        ]
+          { f: "=SUMA(E:E)" },
+        ],
       ];
-      this.productos.forEach((product, index) => {
+      productos.forEach((product, index) => {
         rows.push([
           product.sku,
+          product.familia,
           product.detalle,
+          product.marca,
           product.venta,
           0,
-          { f: `=(C${index + 2}*D${index + 2})` }
+          { f: `=(C${index + 2}*D${index + 2})` },
         ]);
       });
 
@@ -413,7 +385,7 @@ export default {
 
       XLSX.writeFile(wb, "formato.xlsx");
       this.validation.formato = true;
-    }
-  }
+    },
+  },
 };
 </script>

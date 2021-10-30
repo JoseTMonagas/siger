@@ -324,6 +324,13 @@ Route::group(['middleware' => 'auth'], function () {
                 ->name('reportes.guias.view');
             Route::post('guias_emitidas', 'ReportController@historial')
                 ->name("reportes.guias.filter");
+
+            Route::get('cartas', 'ReportController@cartaRequerimientos')
+                ->name('reportes.carta.view');
+            Route::post('cartas', 'ReportController@cartaRequerimientos')
+                ->name("reportes.carta.filter");
+            Route::post('cartas/{requerimiento}', 'ReportController@cartasRequerimientoGenerate')
+                ->name("reportes.carta.download");
         });
     });
 });

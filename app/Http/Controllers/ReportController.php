@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ArrayExport;
+use App\Requerimiento;
 
 class ReportController extends Controller
 {
@@ -52,13 +53,13 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                                       ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                           $query->whereDate("fecha", ">=", $inicio)
-                                                 ->whereDate("fecha", "<=", $fin)
-                                                 ->whereNotNull("febos_id");
-                                       })
-                                       ->orderBy("created_at")
-                                       ->get();
+                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                        $query->whereDate("fecha", ">=", $inicio)
+                            ->whereDate("fecha", "<=", $fin)
+                            ->whereNotNull("febos_id");
+                    })
+                    ->orderBy("created_at")
+                    ->get();
                 $reqEmpresas->load("guiasDespacho");
                 $requerimientos->push($reqEmpresas);
             }
@@ -66,25 +67,25 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                $query->whereDate("fecha", ">=", $inicio)
-                                      ->whereDate("fecha", "<=", $fin)
-                                      ->whereNotNull("febos_id");
-                            })
-                            ->orderBy("created_at")
-                            ->get();
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
             $requerimientos->load("guiasDespacho");
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                $query->whereDate("fecha", ">=", $inicio)
-                                      ->whereDate("fecha", "<=", $fin)
-                                      ->whereNotNull("febos_id");
-                            })
-                            ->orderBy("created_at")
-                            ->get();
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
             $requerimientos->load("guiasDespacho");
         }
 
@@ -131,7 +132,7 @@ class ReportController extends Controller
                     foreach ($requerimiento->guiasDespacho as $guiaDespacho) {
                         if ($guiaDespacho->productos->count() > 0) {
                             foreach ($guiaDespacho->productos as $producto) {
-                                $excelData[] =[
+                                $excelData[] = [
                                     date("d-m-Y", strtotime($guiaDespacho->created_at)),
                                     'PTO MONTT',
                                     'VTA',
@@ -178,13 +179,13 @@ class ReportController extends Controller
         })->toArray();
 
         $requerimientos = \App\Requerimiento::whereIn("centro_id", $ids)
-                        ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                            $query->whereDate("fecha", ">=", $inicio)
-                                  ->whereDate("fecha", "<=", $fin)
-                                  ->whereNotNull("febos_id");
-                        })
-                        ->orderBy("created_at")
-                        ->get();
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin)
+                    ->whereNotNull("febos_id");
+            })
+            ->orderBy("created_at")
+            ->get();
         $requerimientos->load("guiasDespacho");
 
 
@@ -244,7 +245,7 @@ class ReportController extends Controller
                                     $rechazo->producto->venta,
                                     $rechazo->productoGuia->real,
                                     $rechazo->productoGuia->real
-                                    * $rechazo->producto->venta,
+                                        * $rechazo->producto->venta,
                                     $rechazo->motivo
                                 ];
                             }
@@ -311,13 +312,13 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                                       ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                           $query->whereDate("fecha", ">=", $inicio)
-                                                 ->whereDate("fecha", "<=", $fin)
-                                                 ->whereNotNull("febos_id");
-                                       })
-                                       ->orderBy("created_at")
-                                       ->get();
+                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                        $query->whereDate("fecha", ">=", $inicio)
+                            ->whereDate("fecha", "<=", $fin)
+                            ->whereNotNull("febos_id");
+                    })
+                    ->orderBy("created_at")
+                    ->get();
                 $reqEmpresas->load("guiasDespacho", "guiasDespacho.productos");
                 $requerimientos->push($reqEmpresas);
             }
@@ -325,25 +326,25 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                $query->whereDate("fecha", ">=", $inicio)
-                                      ->whereDate("fecha", "<=", $fin)
-                                      ->whereNotNull("febos_id");
-                            })
-                            ->orderBy("created_at")
-                            ->get();
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                $query->whereDate("fecha", ">=", $inicio)
-                                      ->whereDate("fecha", "<=", $fin)
-                                      ->whereNotNull("febos_id");
-                            })
-                            ->orderBy("created_at")
-                            ->get();
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         }
 
@@ -354,12 +355,105 @@ class ReportController extends Controller
             ->with(compact("empresas", "centros", "zonas", "requerimientos"));
     }
 
+    /**
+     * Generar carta de requerimientos emitidas segun un rango de fechas
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function cartaRequerimientos(Request $request)
+    {
+        $inicio = $request->inicio;
+        $fin = $request->fin;
+
+        $requerimientos = collect([]);
+
+        if (isset($request->empresas)) {
+            $empresas = explode(",", $request->empresas);
+            foreach ($empresas as $empresa) {
+                $empresa = \App\Empresa::find($empresa);
+                $reqEmpresas = $empresa->requerimientos()
+                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                        $query->whereDate("fecha", ">=", $inicio)
+                            ->whereDate("fecha", "<=", $fin)
+                            ->whereNotNull("febos_id");
+                    })
+                    ->orderBy("created_at")
+                    ->get();
+                $reqEmpresas->load("guiasDespacho", "guiasDespacho.productos");
+                $requerimientos->push($reqEmpresas);
+            }
+            $requerimientos = $requerimientos->flatten();
+        } elseif (isset($request->centros)) {
+            $centros = explode(",", $request->centros);
+            $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
+        } elseif (isset($request->zonas)) {
+            $abastecimientos = explode(",", $request->zonas);
+            $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
+            $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
+        }
+
+        $empresas = \App\Empresa::all();
+        $centros = \App\Centro::all();
+        $zonas = \App\Abastecimiento::all();
+
+
+        return view("reporte/historial_requerimientos")
+            ->with(compact("empresas", "centros", "zonas", "requerimientos"));
+    }
+
+    public function cartasRequerimientoGenerate(Requerimiento $requerimiento)
+    {
+        $cliente = "{$requerimiento->centro->empresa->razon_social}: {$requerimiento->centro->nombre}";
+        $anyGuiaDespacho = $requerimiento->guiasDespacho->first();
+        $excelData = [
+            ["CLIENTE", $cliente],
+            ["AREA", $requerimiento->centro->zona],
+            ["FECHA DE SOLICITUD", $requerimiento->created_at],
+            ["FECHA DE ENTREGA", $anyGuiaDespacho->fecha],
+            ["Centro", "SKU", "Familia", "Detalle", "Marca", "Cantidad", "Precio Venta", "Total", "Observaciones"]
+        ];
+
+        $productos = $requerimiento->productos()->get();
+
+        foreach ($productos as $producto) {
+            $excelData[] = [
+                $requerimiento->centro->nombre,
+                $producto->sku,
+                $producto->familia,
+                $producto->detalle,
+                $producto->marca,
+                $producto->pivot->real,
+                $producto->venta,
+                ($producto->pivot->real * $producto->venta),
+                $producto->pivot->observacion,
+            ];
+        }
+
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "{$requerimiento->nombre}.xlsx");
+    }
+
+
     public function rebajaView()
     {
         $productos = \DB::table("productos")
-                   ->select("sku", "detalle")
-                   ->groupBy("sku")
-                   ->get();
+            ->select("sku", "detalle")
+            ->groupBy("sku")
+            ->get();
 
         $empresas = \App\Empresa::all();
         $centros = \App\Centro::all();
@@ -395,7 +489,7 @@ class ReportController extends Controller
 
         $productos = \App\Producto::whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
             $query->where("fecha", ">=", $inicio)
-                  ->where("fecha", "<=", $fin);
+                ->where("fecha", "<=", $fin);
         });
 
         if (!empty($skus)) {
@@ -421,7 +515,7 @@ class ReportController extends Controller
             }
 
             $excelData[] = [""];
-            $excelData[] =[
+            $excelData[] = [
                 'FECHA',
                 'ZONA',
                 'DESTINO',
@@ -446,21 +540,21 @@ class ReportController extends Controller
                 );
 
                 switch ($type) {
-                case "EMPRESA":
-                    $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
-                        return $ids->contains($guia->empresaId);
-                    });
-                    break;
-                case "CENTRO":
-                    $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
-                        return $ids->contains($guia->centroId);
-                    });
-                    break;
-                case "ZONA":
-                    $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
-                        return $ids->contains($guia->zonaId);
-                    });
-                    break;
+                    case "EMPRESA":
+                        $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
+                            return $ids->contains($guia->empresaId);
+                        });
+                        break;
+                    case "CENTRO":
+                        $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
+                            return $ids->contains($guia->centroId);
+                        });
+                        break;
+                    case "ZONA":
+                        $guiasDespacho = $guiasDespacho->filter(function ($guia) use ($ids) {
+                            return $ids->contains($guia->zonaId);
+                        });
+                        break;
                 }
 
                 if ($guiasDespacho->count() > 0) {
@@ -508,13 +602,13 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                                       ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                           $query->whereDate("fecha", ">=", $inicio)
-                                                 ->whereDate("fecha", "<=", $fin)
-                                                 ->whereNotNull("febos_id");
-                                       })
-                                       ->orderBy("created_at")
-                                       ->get();
+                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                        $query->whereDate("fecha", ">=", $inicio)
+                            ->whereDate("fecha", "<=", $fin)
+                            ->whereNotNull("febos_id");
+                    })
+                    ->orderBy("created_at")
+                    ->get();
                 $reqEmpresas->load("guiasDespacho", "guiasDespacho.productos");
                 $requerimientos->push($reqEmpresas);
             }
@@ -522,25 +616,25 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                $query->whereDate("fecha", ">=", $inicio)
-                                      ->whereDate("fecha", "<=", $fin)
-                                      ->whereNotNull("febos_id");
-                            })
-                            ->orderBy("created_at")
-                            ->get();
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                $query->whereDate("fecha", ">=", $inicio)
-                                      ->whereDate("fecha", "<=", $fin)
-                                      ->whereNotNull("febos_id");
-                            })
-                            ->orderBy("created_at")
-                            ->get();
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
             $requerimientos->load("guiasDespacho", "guiasDespacho.productos");
         }
 
@@ -594,13 +688,13 @@ class ReportController extends Controller
         })->toArray();
 
         $requerimientos = \App\Requerimiento::whereIn("centro_id", $ids)
-                        ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                            $query->whereDate("fecha", ">=", $inicio)
-                                  ->whereDate("fecha", "<=", $fin)
-                                  ->whereNotNull("febos_id");
-                        })
-                        ->orderBy("created_at")
-                        ->get();
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin)
+                    ->whereNotNull("febos_id");
+            })
+            ->orderBy("created_at")
+            ->get();
         $requerimientos->load("guiasDespacho");
 
         $nroRequerimientos = $requerimientos->count();
@@ -665,16 +759,16 @@ class ReportController extends Controller
         $fin = $request->fin;
 
         $empresa = Auth::user()->userable;
-        
+
 
         $requerimientos = $empresa->requerimientos()
-                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                      $query->whereDate("fecha", ">=", $inicio)
-                                            ->whereDate("fecha", "<=", $fin)
-                                            ->whereNotNull("febos_id");
-                                  })
-                                  ->orderBy("created_at")
-                                  ->get();
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin)
+                    ->whereNotNull("febos_id");
+            })
+            ->orderBy("created_at")
+            ->get();
         $requerimientos->load("guiasDespacho");
 
         $excelData = [
@@ -701,7 +795,7 @@ class ReportController extends Controller
                                     $rechazo->producto->venta,
                                     $rechazo->productoGuia->pivot->real,
                                     $rechazo->producto->venta
-                                    * $rechazo->productoGuia->pivot->real,
+                                        * $rechazo->productoGuia->pivot->real,
                                     $rechazo->motivo,
                                     $rechazo->productoGuia->observacion
                                 ];
@@ -730,13 +824,13 @@ class ReportController extends Controller
         $empresa = Auth::user()->userable;
 
         $requerimientos = $empresa->requerimientos()
-                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                      $query->whereDate("fecha", ">=", $inicio)
-                                            ->whereDate("fecha", "<=", $fin)
-                                            ->whereNotNull("febos_id");
-                                  })
-                                  ->orderBy("created_at")
-                                  ->get();
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin)
+                    ->whereNotNull("febos_id");
+            })
+            ->orderBy("created_at")
+            ->get();
         $requerimientos->load("guiasDespacho");
 
         $excelData = [
@@ -755,14 +849,14 @@ class ReportController extends Controller
                         $recibido = null;
                         if (!empty($requerimiento->detalleEstado("RECIBIDO"))) {
                             $recibido = $requerimiento
-                                      ->detalleEstado("RECIBIDO")
-                                      ->created_at;
+                                ->detalleEstado("RECIBIDO")
+                                ->created_at;
                         }
                         $observacion = null;
                         if (!empty($requerimiento->detalleEstado("RECIBIDO CON OBSERVACIONES"))) {
                             $observacion = $requerimiento
-                                         ->detalleEstado("RECIBIDO CON OBSERVACIONES")
-                                         ->created_at;
+                                ->detalleEstado("RECIBIDO CON OBSERVACIONES")
+                                ->created_at;
                         }
                         $fechaRecepcion = empty($recibido) ? $observacion : $recibido;
                         $fechaRecepcion = empty($fechaRecepcion) ? "SIN RECIBIR" : $fechaRecepcion;
@@ -803,21 +897,21 @@ class ReportController extends Controller
         $empresa = Auth::user()->userable;
 
         $requerimientos = $empresa->requerimientos()
-                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                      $query->whereDate("fecha", ">=", $inicio)
-                                            ->whereDate("fecha", "<=", $fin)
-                                            ->whereNotNull("febos_id");
-                                  })
-                                  ->orderBy("created_at")
-                                  ->get();
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin)
+                    ->whereNotNull("febos_id");
+            })
+            ->orderBy("created_at")
+            ->get();
         $requerimientos->load("productosRechazados");
 
         $rechazos = $requerimientos
-                  ->pluck("productosRechazados")
-                  ->flatten()
-                  ->filter(function ($rechazo) {
-                      return $rechazo->estado_pago && $rechazo->cierre;
-                  });
+            ->pluck("productosRechazados")
+            ->flatten()
+            ->filter(function ($rechazo) {
+                return $rechazo->estado_pago && $rechazo->cierre;
+            });
 
         $excelData = [
             [
@@ -839,7 +933,7 @@ class ReportController extends Controller
                     $rechazo->producto->venta,
                     $rechazo->productoGuia->pivot->real,
                     $rechazo->producto->venta *
-                    $rechazo->productoGuia->pivot->real,
+                        $rechazo->productoGuia->pivot->real,
                     $rechazo->motivo,
                     $rechazo->productoGuia->pivot->observacion
                 ];
@@ -864,21 +958,21 @@ class ReportController extends Controller
         $empresa = Auth::user()->userable;
 
         $requerimientos = $empresa->requerimientos()
-                                  ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                                      $query->whereDate("fecha", ">=", $inicio)
-                                            ->whereDate("fecha", "<=", $fin);
-                                      //->whereNotNull("febos_id");
-                                  })
-                                  ->orderBy("created_at")
-                                  ->get();
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin);
+                //->whereNotNull("febos_id");
+            })
+            ->orderBy("created_at")
+            ->get();
         $requerimientos->load("productosRechazados");
 
         $rechazos = $requerimientos
-                  ->pluck("productosRechazados")
-                  ->flatten()
-                  ->filter(function ($rechazo) {
-                      return !$rechazo->estado_pago && $rechazo->cierre;
-                  });
+            ->pluck("productosRechazados")
+            ->flatten()
+            ->filter(function ($rechazo) {
+                return !$rechazo->estado_pago && $rechazo->cierre;
+            });
 
         $excelData = [
             [
@@ -900,7 +994,7 @@ class ReportController extends Controller
                     $rechazo->producto->venta,
                     $rechazo->productoGuia->pivot->real,
                     $rechazo->producto->venta *
-                    $rechazo->productoGuia->pivot->real,
+                        $rechazo->productoGuia->pivot->real,
                     $rechazo->motivo,
                     $rechazo->productoGuia->pivot->observacion
                 ];
