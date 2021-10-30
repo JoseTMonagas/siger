@@ -9,7 +9,7 @@ class Producto extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['sku', 'detalle', 'costo', 'venta', 'desde', 'hasta', 'empresa_id'];
+    protected $fillable = ['sku', 'detalle', 'costo', 'venta', 'desde', 'hasta', 'empresa_id', 'familia', 'marca', 'reemplazo'];
     protected $appends = ["editRoute", "DeleteRoute"];
     /**
      * Devuelve los requerimientos que contienen a ese Producto
@@ -115,19 +115,19 @@ class Producto extends Model
         $guias = $guias->get();
 
         if (isset($ids) && isset($type)) {
-            switch($type) {
+            switch ($type) {
                 case "EMPRESA":
-                    $guias = $guias->filter(function($guia) use ($ids) {
+                    $guias = $guias->filter(function ($guia) use ($ids) {
                         return $ids->contains($guia->empresaId);
                     });
                     break;
                 case "CENTRO":
-                    $guias = $guias->filter(function($guia) use ($ids) {
+                    $guias = $guias->filter(function ($guia) use ($ids) {
                         return $ids->contains($guia->centroId);
                     });
                     break;
                 case "ZONA":
-                    $guias = $guias->filter(function($guia) use ($ids) {
+                    $guias = $guias->filter(function ($guia) use ($ids) {
                         return $ids->contains($guia->zonaId);
                     });
                     break;
@@ -135,15 +135,15 @@ class Producto extends Model
         }
 
         if ($guias->count() > 0) {
-            $cantidad = $guias->reduce(function($acc, $guia) {
+            $cantidad = $guias->reduce(function ($acc, $guia) {
                 return $acc + $guia->pivot->cantidad;
             });
 
-            $real = $guias->reduce(function($acc, $guia) {
+            $real = $guias->reduce(function ($acc, $guia) {
                 return $acc + $guia->pivot->real;
             });
 
-            $subtotal = $guias->reduce(function($acc, $guia) {
+            $subtotal = $guias->reduce(function ($acc, $guia) {
                 return $acc + ($guia->pivot->real * $guia->pivot->precio);
             });
 
@@ -178,19 +178,19 @@ class Producto extends Model
         $guias = $guias->get();
 
         if (isset($ids) && isset($type)) {
-            switch($type) {
+            switch ($type) {
                 case "EMPRESA":
-                    $guias = $guias->filter(function($guia) use ($ids) {
+                    $guias = $guias->filter(function ($guia) use ($ids) {
                         return $ids->contains($guia->empresaId);
                     });
                     break;
                 case "CENTRO":
-                    $guias = $guias->filter(function($guia) use ($ids) {
+                    $guias = $guias->filter(function ($guia) use ($ids) {
                         return $ids->contains($guia->centroId);
                     });
                     break;
                 case "ZONA":
-                    $guias = $guias->filter(function($guia) use ($ids) {
+                    $guias = $guias->filter(function ($guia) use ($ids) {
                         return $ids->contains($guia->zona);
                     });
                     break;
@@ -198,7 +198,7 @@ class Producto extends Model
         }
 
         if ($guias->count() > 0) {
-            return $guias->reduce(function($acc, $guia) {
+            return $guias->reduce(function ($acc, $guia) {
                 return $acc + $guia->pivot->cantidad;
             });
         }
@@ -223,14 +223,14 @@ class Producto extends Model
         }
 
         $requerimientos = $requerimientos->get();
-        $data = $requerimientos->map(function($requerimiento) {
-            if(isset($requerimiento->nombre) && isset($requerimiento->centro->nombre)) {
-            return [
-                "nombre" => $requerimiento->nombre,
-                "fecha" => \Carbon\Carbon::parse($requerimiento->created_at)->format("d-M-Y"),
-                "centro" => $requerimiento->centro->nombre,
-                "empresa" => $requerimiento->centro->empresa->razon_social
-            ];
+        $data = $requerimientos->map(function ($requerimiento) {
+            if (isset($requerimiento->nombre) && isset($requerimiento->centro->nombre)) {
+                return [
+                    "nombre" => $requerimiento->nombre,
+                    "fecha" => \Carbon\Carbon::parse($requerimiento->created_at)->format("d-M-Y"),
+                    "centro" => $requerimiento->centro->nombre,
+                    "empresa" => $requerimiento->centro->empresa->razon_social
+                ];
             }
         });
 

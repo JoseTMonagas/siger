@@ -16,7 +16,8 @@ class ProductoImport implements ToCollection, WithHeadingRow
     public $err;
     private $empresa;
 
-    public function __construct(Empresa $empresa) {
+    public function __construct(Empresa $empresa)
+    {
         $this->err = collect([]);
         $this->empresa = $empresa;
     }
@@ -30,6 +31,9 @@ class ProductoImport implements ToCollection, WithHeadingRow
             $venta = null;
             $desde = null;
             $hasta = null;
+            $familia = null;
+            $marca = null;
+            $reemplazo = false;
 
             if (isset($row["sku"])) {
                 $sku = str_pad($row["sku"], 11, "0", STR_PAD_LEFT);
@@ -64,7 +68,7 @@ class ProductoImport implements ToCollection, WithHeadingRow
             if (isset($row["desde"])) {
                 $desde = DateTime::createFromFormat("j-n-Y", $row["desde"]);
 
-                if(!$desde) {
+                if (!$desde) {
                     $this->err->push($row);
                     continue;
                 }
@@ -89,6 +93,18 @@ class ProductoImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
+            if (isset($row["marca"])) {
+                $marca = $row["marca"];
+            }
+
+            if (isset($row["familia"])) {
+                $familia = $row["familia"];
+            }
+
+            if (isset($row["reemplazo"]) && $row["reemplazo"]) {
+                $reemplazo = true;
+            }
+
             $this->empresa->productos()->create([
                 "sku" => $sku,
                 "detalle" => $detalle,
@@ -96,6 +112,9 @@ class ProductoImport implements ToCollection, WithHeadingRow
                 "venta" => $venta,
                 "desde" => $desde,
                 "hasta" => $hasta,
+                "marca" => $marca,
+                "familia" => $familia,
+                "reemplazo" => $reemplazo
             ]);
         }
     }
