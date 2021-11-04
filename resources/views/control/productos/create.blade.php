@@ -17,12 +17,12 @@
 
             @if(isset($status))
             <div class="row">
-              <div class="alert alert-danger">
-                @foreach($status["errors"] as $error)
-                  {{ _("Error en la fila: ". $error["sku"]) }}
-                  <br/>
-                @endforeach
-              </div>
+                <div class="alert alert-danger">
+                    @foreach($status["errors"] as $error)
+                    {{ _("Error en la fila: ". $error["sku"]) }}
+                    <br />
+                    @endforeach
+                </div>
             </div>
             @endif
 
@@ -31,7 +31,11 @@
                     <div class="container">
                         <div class="d-flex flex-column">
                             <strong>Descarga el formato de carga masiva de productos</strong>
-                            <a class="btn btn-info" href="{{ asset("storage/formatos/productos.xlsx") }}" target="_BLANK">Aqui</a>
+                            <form method="POST" id="" action="{{ route("productos.formato-carga-masiva") }}">
+                                @csrf
+
+                                <button class="btn btn-info">Aqui</button>
+                            </form>
                         </div>
                     </div>
                 </div>

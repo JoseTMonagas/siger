@@ -246,6 +246,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('empresas/{empresa}/productos/show', 'ProductoController@show')->name('empresas.productos.show');
         Route::resource('empresas.productos', 'ProductoController')->shallow();
+        Route::post("empresas/productos/formato", "ProductoController@formatoCargaMasiva")->name("productos.formato-carga-masiva");
 
         Route::resources([
             'holdings' => 'HoldingController',

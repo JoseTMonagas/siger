@@ -131,29 +131,17 @@ class ProductoController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Producto  $producto
-     * @return \Illuminate\Http\Response
+     * Generate an excel file with the required headers
+     * to import Producto
+     * @return Excel
      */
-    public function exportarProductos(Empresa $empresa)
+    public function formatoCargaMasiva()
     {
-        $productos = $empresa->productosVigentes;
-
         $excelData = [
-            ["sku", "familia", "detalle", "marca", "costo", "venta", "desde", "hasta", "reemplazo"],
+            ["sku", "marca", "detalle", "familia", "costo", "venta", "desde", "hasta", "reemplazo"]
         ];
 
-        if ($productos->count() > 0) {
-            foreach ($productos as $producto) {
-                $excelData[] = [
-                    $producto->sku, $producto->familia,  $producto->detalle, $producto->marca, $producto->costo,
-                    $producto->venta, $producto->desde, $producto->hasta, $producto->reemplazo ? "Si" : ""
-                ];
-            }
-        }
-
-        $export =  new ArrayExport($excelData);
-        return Excel::download($export, "Productos Vigentes {$empresa->razon_social}.xlsx");
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "Productos.xlsx");
     }
 }
