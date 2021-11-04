@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Empresa;
+use App\Exports\ArrayExport;
 use App\Http\Requests\ProductoForm;
 use App\Imports\ProductoImport;
 use App\Producto;
@@ -66,28 +67,24 @@ class ProductoController extends Controller
      */
     public function show(Empresa $empresa)
     {
-        
+
         $productos = $empresa->productosVigentes;
 
-        $csv = fopen(storage_path("productos-vigentes.csv"), "w");
-        fputcsv($csv, [
-            "sku", "detalle", "costo",
-            "venta", "desde", "hasta"
-        ]);
+        $excelData = [
+            ["sku", "familia", "detalle", "marca", "costo", "venta", "desde", "hasta", "reemplazo"],
+        ];
 
         if ($productos->count() > 0) {
             foreach ($productos as $producto) {
-                fputcsv($csv, [
-                    $producto->sku, $producto->detalle, $producto->costo,
-                    $producto->venta, $producto->desde, $producto->hasta
-                ]);
+                $excelData[] = [
+                    $producto->sku, $producto->familia,  $producto->detalle, $producto->marca, $producto->costo,
+                    $producto->venta, $producto->desde, $producto->hasta, $producto->reemplazo ? "Si" : ""
+                ];
             }
         }
-        
 
-        return response()
-        ->download(storage_path("productos-vigentes.csv"))
-        ->deleteFileAfterSend();
+        $export =  new ArrayExport($excelData);
+        return Excel::download($export, "Productos Vigentes {$empresa->razon_social}.xlsx");
     }
 
     /**
@@ -132,8 +129,8 @@ class ProductoController extends Controller
             ]
         ]);
     }
-    
-        /**
+
+    /**
      * Display the specified resource.
      *
      * @param  \App\Producto  $producto
@@ -143,24 +140,20 @@ class ProductoController extends Controller
     {
         $productos = $empresa->productosVigentes;
 
-        $csv = fopen(storage_path("productos-vigentes.csv"), "w");
-        fputcsv($csv, [
-            "sku", "detalle", "costo",
-            "venta", "desde", "hasta"
-        ]);
+        $excelData = [
+            ["sku", "familia", "detalle", "marca", "costo", "venta", "desde", "hasta", "reemplazo"],
+        ];
 
         if ($productos->count() > 0) {
             foreach ($productos as $producto) {
-                fputcsv($csv, [
-                    $producto->sku, $producto->detalle, $producto->costo,
-                    $producto->venta, $producto->desde, $producto->hasta
-                ]);
+                $excelData[] = [
+                    $producto->sku, $producto->familia,  $producto->detalle, $producto->marca, $producto->costo,
+                    $producto->venta, $producto->desde, $producto->hasta, $producto->reemplazo ? "Si" : ""
+                ];
             }
         }
-        
 
-        return response()
-        ->download(storage_path("productos-vigentes.csv"))
-        ->deleteFileAfterSend();
+        $export =  new ArrayExport($excelData);
+        return Excel::download($export, "Productos Vigentes {$empresa->razon_social}.xlsx");
     }
 }
