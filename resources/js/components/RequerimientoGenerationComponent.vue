@@ -22,7 +22,8 @@
                 <v-btn
                   :color="validation.formato ? 'success' : 'warning'"
                   @click="makeExcelFile"
-                >Descargar Formato</v-btn>
+                  >Descargar Formato</v-btn
+                >
               </div>
             </div>
           </div>
@@ -38,7 +39,11 @@
             <div class="row justify-content-center">
               <div class="col-md-4">
                 <label for>Ingrese el archivo excel (XLSX):</label>
-                <input class="form-control" type="file" @change="validateFile" />
+                <input
+                  class="form-control"
+                  type="file"
+                  @change="validateFile"
+                />
               </div>
             </div>
             <div
@@ -114,7 +119,9 @@
                         <td>{{ getDetalleBySKU(producto.sku) }}</td>
                         <td>{{ getVentaBySKU(producto.sku) }}</td>
                         <td>{{ producto.cantidad }}</td>
-                        <td>{{ getVentaBySKU(producto.sku) * producto.cantidad }}</td>
+                        <td>
+                          {{ getVentaBySKU(producto.sku) * producto.cantidad }}
+                        </td>
                       </tr>
                     </tbody>
                   </template>
@@ -140,7 +147,12 @@
 
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn :loading="loading" :disabled="loading" @click="currentStep = 2">Regresar</v-btn>
+              <v-btn
+                :loading="loading"
+                :disabled="loading"
+                @click="currentStep = 2"
+                >Regresar</v-btn
+              >
             </div>
             <div class="col-md-2">
               <v-btn
@@ -148,7 +160,8 @@
                 :disabled="loading"
                 color="success"
                 @click="save"
-              >Confirmar y Solicitar</v-btn>
+                >Confirmar y Solicitar</v-btn
+              >
             </div>
           </div>
         </v-stepper-content>
@@ -169,32 +182,32 @@ export default {
   props: {
     formatoDownload: {
       type: String,
-      required: true,
+      required: true
     },
     productos: {
       type: Array,
-      required: true,
+      required: true
     },
     empresa: {
       type: Object,
-      required: true,
+      required: true
     },
     centro: {
       type: Object,
-      required: true,
+      required: true
     },
     nombreRequerimiento: {
       type: String,
-      required: true,
+      required: true
     },
     numeroRequerimiento: {
       type: String,
-      required: true,
+      required: true
     },
     storeRoute: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   computed: {
     totalRequerimiento() {
@@ -222,7 +235,7 @@ export default {
           return "Aqui puede confirmar los productos del requerimiento, en caso de que quiera cambiar alguna cantidad o producto puede Regresar al paso anterior y cargar de nuevo el formato excel; de estar todo correcto puede hacer la solicitud del requerimiento.";
           break;
       }
-    },
+    }
   },
   data() {
     return {
@@ -231,13 +244,13 @@ export default {
         formato: false,
         file: {
           status: false,
-          errors: [],
-        },
+          errors: []
+        }
       },
       fileProductos: [],
       fileExcel: null,
       isEditing: false,
-      loading: false,
+      loading: false
     };
   },
   methods: {
@@ -260,25 +273,25 @@ export default {
       const schema = {
         SKU: {
           prop: "sku",
-          type: (value) => {
+          type: value => {
             if (!this.validateSKU(value)) {
               throw new Error("SKU INVALIDO");
             } else {
               return value;
             }
-          },
+          }
         },
         CANTIDAD: {
           prop: "cantidad",
-          type: (value) => {
+          type: value => {
             const cantidad = parseFloat(value);
             if (cantidad === NaN || cantidad < 0) {
               throw new Error("CANTIDAD INVALIDA");
             } else {
               return cantidad;
             }
-          },
-        },
+          }
+        }
       };
       readXlsxFile(file, { schema }).then(({ rows, errors }) => {
         if (errors.length > 0) {
@@ -286,15 +299,15 @@ export default {
           this.validation.file.errors = errors;
         } else {
           this.validation.file.status = true;
-          this.fileProductos = rows.filter((row) => row.cantidad > 0);
+          this.fileProductos = rows.filter(row => row.cantidad > 0);
         }
       });
     },
     validateSKU(sku) {
-      return this.productos.some((producto) => producto.sku == sku);
+      return this.productos.some(producto => producto.sku == sku);
     },
     getProductoBySKU(sku) {
-      return this.productos.find((producto) => producto.sku == sku);
+      return this.productos.find(producto => producto.sku == sku);
     },
     getDetalleBySKU(sku) {
       const producto = this.getProductoBySKU(sku);
@@ -315,7 +328,7 @@ export default {
       this.loading = true;
       axios
         .post(this.storeRoute, { productos })
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -335,7 +348,7 @@ export default {
           }
           this.loading = false;
         })
-        .then((resp) => {
+        .then(resp => {
           if (resp.status == 201) {
             alert("Guardado Exitosamente");
             this.loading = false;
@@ -349,11 +362,11 @@ export default {
         Title: "Productos Disponibles",
         Subject: "Requerimiento para Compass",
         Author: "Mline",
-        CreatedDate: new Date(),
+        CreatedDate: new Date()
       };
       wb.SheetNames.push("Productos");
       const productos = this.productos.filter(
-        (producto) => !producto.reemplazo
+        producto => !parseInt(producto.reemplazo)
       );
       let rows = [
         [
@@ -365,8 +378,8 @@ export default {
           "CANTIDAD",
           "SUBTOTAL",
           "TOTAL=",
-          { f: "=SUMA(E:E)" },
-        ],
+          { f: "=SUMA(E:E)" }
+        ]
       ];
       productos.forEach((product, index) => {
         rows.push([
@@ -376,7 +389,7 @@ export default {
           product.marca,
           product.venta,
           0,
-          { f: `=(C${index + 2}*D${index + 2})` },
+          { f: `=(C${index + 2}*D${index + 2})` }
         ]);
       });
 
@@ -385,7 +398,7 @@ export default {
 
       XLSX.writeFile(wb, "formato.xlsx");
       this.validation.formato = true;
-    },
-  },
+    }
+  }
 };
 </script>
