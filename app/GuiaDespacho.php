@@ -27,7 +27,7 @@ class GuiaDespacho extends Model
 
     public function productos()
     {
-        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento');
+        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido");
     }
 
     public function rechazos()
@@ -53,6 +53,34 @@ class GuiaDespacho extends Model
     public function getZonaIdAttribute()
     {
         return $this->requerimiento->transporte->abastecimiento->id;
+    }
+
+    public function hasAceptadas(): bool
+    {
+        $productos = $this->productos()->wherePivot("tipo_observacion_id", 1)->get();
+
+        return $productos->count() > 0;
+    }
+
+    public function hasRechazadas(): bool
+    {
+        $productos = $this->productos()->wherePivotIn("tipo_observacion_id", [2, 3])->get();
+
+        return $productos->count() > 0;
+    }
+
+    public function hasObservadas(): bool
+    {
+        $productos = $this->productos()->wherePivotIn("tipo_observacion_id", [4, 5, 6, 7])->get();
+
+        return $productos->count() > 0;
+    }
+
+    public function getObservacionesCountById(int $id): int
+    {
+        $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->get();
+
+        return $productos->count();
     }
 
 

@@ -353,8 +353,9 @@ export default {
       };
       wb.SheetNames.push("Productos");
       const productos = this.productos.filter(
-        (producto) => !producto.reemplazo
+        (producto) => !parseInt(producto.reemplazo)
       );
+
       let rows = [
         [
           "SKU",

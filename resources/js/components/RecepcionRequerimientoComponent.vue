@@ -1,5 +1,5 @@
 <template>
-  <v-stepper v-model="currentStep" non-linear>
+  <v-stepper v-model="currentStep" non-linear vertical>
     <v-stepper-header>
       <v-stepper-step
         v-for="(guiaDespacho, index) in guiasDespacho"
@@ -29,12 +29,12 @@
                 <template v-slot:default>
                   <thead>
                     <tr>
-                      <th>Rechazar</th>
-                      <th>Detalle</th>
-                      <th>Cant Solicitada</th>
-                      <th>Cant Despachado</th>
-                      <th>Observacion</th>
-                      <th>Motivo</th>
+                      <th>ID</th>
+                      <th>NOMBRE</th>
+                      <th>CANTIDAD</th>
+                      <th>ESTADO</th>
+                      <th>RECIBIDO</th>
+                      <th>OBSERVACION</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -44,50 +44,31 @@
                       :key="indexProductos"
                       :class="getContextClass(indexGuias, indexProductos)"
                     >
+                      <td>{{ producto.sku }}</td>
+                      <td>{{ producto.detalle }}</td>
+                      <td>{{ producto.pivot.real }}</td>
                       <td>
-                        <v-checkbox
-                          v-model="
-                            productosEditados[indexGuias][indexProductos]
-                              .rechazado
-                          "
-                        ></v-checkbox>
+                        <select class="form-control" v-model="producto.pivot.tipo_observacion_id">
+                          <option
+                            v-for="observacion in observaciones"
+                            :value="observacion.id"
+                            :key="`${indexGuias}-${indexProductos}-${observacion.id}`"
+                          >{{ observacion.nombre }}</option>
+                        </select>
+                        <small>{{ getObservacionLabel(producto) }}</small>
                       </td>
                       <td>
-                        {{ producto.detalle }}
+                        <input
+                          class="form-control"
+                          :disabled="observacionRequiresInput(producto)"
+                          v-model="producto.pivot.cantidad_recibido"
+                          name
+                          type="number"
+                          value
+                        />
                       </td>
                       <td>
-                        {{ producto.pivot.cantidad }}
-                      </td>
-                      <td>
-                        {{ producto.pivot.real }}
-                      </td>
-                      <td>
-                        {{ producto.pivot.observacion }}
-                      </td>
-                      <td>
-                        <small
-                          v-if="
-                            productosEditados[indexGuias][indexProductos]
-                              .rechazado
-                          "
-                          class="text-secondary"
-                        >
-                          <b>
-                            Ingrese motivo del rechazo
-                          </b>
-                        </small>
-                        <v-text-field
-                          class="my-2"
-                          outlined
-                          label="Motivo del Rechazo"
-                          :disabled="
-                            !productosEditados[indexGuias][indexProductos]
-                              .rechazado
-                          "
-                          v-model="
-                            productosEditados[indexGuias][indexProductos].motivo
-                          "
-                        ></v-text-field>
+                        <textarea class="form-control"></textarea>
                       </td>
                     </tr>
                   </tbody>
@@ -97,9 +78,7 @@
           </div>
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn color="primary" @click="currentStep = ++indexGuias"
-                >Continuar</v-btn
-              >
+              <v-btn color="primary" @click="currentStep = ++indexGuias">Continuar</v-btn>
             </div>
           </div>
         </div>
@@ -108,9 +87,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-md">
-              <strong>
-                Los siguientes productos seran rechazados:
-              </strong>
+              <strong>Los siguientes productos seran rechazados:</strong>
             </div>
           </div>
           <div class="row">
@@ -122,13 +99,15 @@
                       <th>Folio Guia</th>
                       <th>Detalle</th>
                       <th>Motivo</th>
+                      <th>Cantidad</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(producto, index) in rechazados">
-                      <td>{{ getFolioByProductId(producto.id) }}</td>
-                      <td>{{ producto.detalle }}</td>
-                      <td>{{ producto.motivo }}</td>
+                    <tr v-for="(summary, index) in summary" :key="index">
+                      <td>{{ summary.guia.folio }}</td>
+                      <td>{{ summary.product.detalle }}</td>
+                      <td>{{ getObservacionById(summary.product.pivot.tipo_observacion_id) }}</td>
+                      <td>{{ summary.product.pivot.cantidad_recibido }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -150,12 +129,16 @@ export default {
   props: {
     guiasDespacho: {
       type: Array,
-      required: true
+      required: true,
     },
     storeRoute: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
+    observaciones: {
+      type: Array,
+      required: true,
+    },
   },
   mounted() {
     for (let i = 0; i < this.guiasDespacho.length; i++) {
@@ -167,21 +150,24 @@ export default {
     lastStep() {
       return this.guiasDespacho.length;
     },
-    rechazados() {
-      const productos = this.productosEditados.flat();
-      return productos.filter(producto => producto.rechazado);
-    }
+  },
+  watch: {
+    currentStep() {
+      this.summary = this.summaryObservacion();
+    },
   },
   data() {
     return {
       currentStep: 0,
-      productosEditados: []
+      productosEditados: [],
+      tiposObservaciones: [],
+      summary: undefined,
     };
   },
   methods: {
     getContextClass(indexGuias, indexProductos) {
-      const rechazado = this.productosEditados[indexGuias][indexProductos]
-        .rechazado;
+      const rechazado =
+        this.productosEditados[indexGuias][indexProductos].rechazado;
 
       if (rechazado) {
         return "table-warning";
@@ -189,17 +175,45 @@ export default {
         return "";
       }
     },
+    summaryObservacion() {
+      let summary = [];
+
+      for (const guia of this.guiasDespacho) {
+        for (const product of guia.productos) {
+          if (product.pivot.tipo_observacion_id > 1) {
+            summary.push({ guia, product });
+          }
+        }
+      }
+
+      return summary;
+    },
+    getObservacionLabel(producto) {
+      const observacion = this.observaciones.find(
+        (observacion) => observacion.id == producto.pivot.tipo_observacion_id
+      );
+
+      if (observacion !== undefined) {
+        return observacion.estado;
+      }
+      return "";
+    },
+    observacionRequiresInput(producto) {
+      const ID_REQUIRES_INPUT = [3, 4, 5, 6, 7];
+
+      return !ID_REQUIRES_INPUT.includes(producto.pivot.tipo_observacion_id);
+    },
     validateStep(indexGuia) {
       if (this.productosEditados.length > 0 && indexGuia > -1) {
         return this.productosEditados[indexGuia].some(
-          producto => producto.rechazado && producto.motivo == ""
+          (producto) => producto.rechazado && producto.motivo == ""
         );
       }
       return true;
     },
     getFolioByProductId(productId) {
-      const guia = this.guiasDespacho.find(guia =>
-        guia.productos.some(producto => producto.id == productId)
+      const guia = this.guiasDespacho.find((guia) =>
+        guia.productos.some((producto) => producto.id == productId)
       );
 
       if (guia != undefined) {
@@ -208,8 +222,8 @@ export default {
       return "";
     },
     getGuiaIdByProductId(productId) {
-      const guia = this.guiasDespacho.find(guia =>
-        guia.productos.some(producto => producto.id == productId)
+      const guia = this.guiasDespacho.find((guia) =>
+        guia.productos.some((producto) => producto.id == productId)
       );
 
       if (guia != undefined) {
@@ -217,14 +231,21 @@ export default {
       }
       return false;
     },
+    getObservacionById(id) {
+      const observacion = this.observaciones.find(
+        (observacion) => observacion.id == id
+      );
+
+      if (observacion !== undefined) {
+        return observacion.nombre;
+      }
+      return "S/I";
+    },
     save() {
-      let rechazados = this.rechazados;
-      rechazados.forEach(rechazado => {
-        rechazado.guia = this.getGuiaIdByProductId(rechazado.id);
-      });
+      let rechazados = this.summaryObservacion();
       axios
         .post(this.storeRoute, { rechazados })
-        .catch(function(error) {
+        .catch(function (error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -242,13 +263,13 @@ export default {
           }
           console.log(error.config);
         })
-        .then(resp => {
+        .then((resp) => {
           if (resp.status == 201) {
             alert("Guardado exitosamente");
             window.location.href = resp.data;
           }
         });
-    }
-  }
+    },
+  },
 };
 </script>

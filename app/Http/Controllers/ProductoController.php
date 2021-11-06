@@ -138,7 +138,7 @@ class ProductoController extends Controller
     public function formatoCargaMasiva()
     {
         $excelData = [
-            ["sku", "marca", "detalle", "familia", "costo", "venta", "desde", "hasta", "reemplazo"]
+            ["sku",  "familia", "detalle", "marca", "costo", "venta", "desde", "hasta", "reemplazo"]
         ];
 
         $export = new ArrayExport($excelData);

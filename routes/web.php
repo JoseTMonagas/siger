@@ -334,4 +334,10 @@ Route::group(['middleware' => 'auth'], function () {
                 ->name("reportes.carta.download");
         });
     });
+
+
+    Route::group(["prefix" => "estado_pago"], function () {
+        Route::get("general", "EstadoPagoController@cuadroEstadoGeneral")->name("estado_pago_general");
+        Route::post("general", "EstadoPagoController@generateEstadoGeneral")->name("generate_estado_general");
+    });
 });

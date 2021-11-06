@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Imports\RequerimientosImport;
 use App\Producto;
+use App\TipoObservacion;
 use Maatwebsite\Excel\Facades\Excel;
 
 class RequerimientoController extends Controller
@@ -710,19 +711,24 @@ class RequerimientoController extends Controller
     {
         $guiasDespacho = $requerimiento->guiasDespacho;
         $guiasDespacho->load("productos");
+
+        $observaciones = TipoObservacion::all();
+
         return view("requerimiento.recepcion")
-            ->with(compact('guiasDespacho', 'requerimiento'));
+            ->with(compact('guiasDespacho', 'requerimiento', "observaciones"));
     }
 
     public function recepcion(Requerimiento $requerimiento, Request $request)
     {
         foreach ($request->rechazados as $rechazado) {
+            $guiaDespacho = null;
+
             if (isset($rechazado["guia"])) {
-                $guiaDespacho = \App\GuiaDespacho::find($rechazado["guia"]);
-                $guiaDespacho->rechazos()->create([
-                    "producto_id" => $rechazado["id"],
-                    "motivo" => $rechazado["motivo"]
-                ]);
+                $guiaDespacho = \App\GuiaDespacho::find($rechazado["guia"]["id"]);
+            }
+
+            if (isset($rechazado["product"])) {
+                $guiaDespacho->productos()->updateExistingPivot($rechazado["product"]["id"], $rechazado["product"]["pivot"]);
             }
         }
 

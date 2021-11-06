@@ -3,31 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Rechazo;
+use App\TipoObservacion;
 use Illuminate\Http\Request;
 
 class RechazoController extends Controller
 {
     public function show(\App\Requerimiento $requerimiento)
     {
-        $rechazos = $requerimiento->productosRechazados;
-        $rechazos->load("guiaDespacho", "producto");
-        $rechazos->each(function ($rechazo) {
-            $rechazo["cantidad"] = $rechazo->productoGuia->pivot->real;
-        });
+        $guiasDespacho = $requerimiento->guiasDespacho;
 
-        return view("requerimiento.rechazo.show", compact("rechazos"));
+        $observados = collect([]);
+
+        foreach ($guiasDespacho as $guia) {
+            foreach ($guia->productos as $producto) {
+                if ($producto->pivot->tipo_observacion_id > 1) {
+                    $observados->push(["producto" => $producto, "guia" => $guia, "motivo" => TipoObservacion::find($producto->pivot->tipo_observacion_id)]);
+                }
+            }
+        }
+
+        return view("requerimiento.rechazo.show", compact("observados"));
     }
 
-    public function estadoView(\App\GuiaDespacho $guiaDespacho=null)
+    public function estadoView(\App\GuiaDespacho $guiaDespacho = null)
     {
         if (isset($guiaDespacho)) {
-            
+
             $rechazos = $guiaDespacho->rechazos;
         } else {
             $empresa = \Auth::user()->userable;
             $requerimientos = $empresa->requerimientos()->where("estado", "RECIBIDO CON OBSERVACIONES")->get();
             $requerimientos->load("productosRechazados");
-            $rechazos = $requerimientos->flatMap(function($requerimiento) {
+            $rechazos = $requerimientos->flatMap(function ($requerimiento) {
                 return $requerimiento->productosRechazados;
             });
         }
@@ -46,9 +53,8 @@ class RechazoController extends Controller
     public function guardarEstados(Request $request)
     {
         Rechazo::whereIn("id", json_decode($request->rechazos))
-                  ->update(["cierre" => true]);
+            ->update(["cierre" => true]);
 
         return redirect()->route("home");
-
     }
 }
