@@ -339,5 +339,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(["prefix" => "estado_pago"], function () {
         Route::get("general", "EstadoPagoController@cuadroEstadoGeneral")->name("estado_pago_general");
         Route::post("general", "EstadoPagoController@generateEstadoGeneral")->name("generate_estado_general");
+
+        Route::get("{guiaDespacho}/concepto/{tipoObservacion}", "EstadoPagoController@concepto")->name("estado_pago_concepto");
+        Route::post("{guiaDespacho}/concepto/{tipoObservacion}", "EstadoPagoController@enviarActualizacion")->name("estado_pago_actualizado");
+
+        Route::post("{guiaDespacho}/producto", "EstadoPagoController@conceptoStore")->name("estado_pago_concepto_store");
+        Route::post("{guiaDespacho}/producto/{producto?}", "EstadoPagoController@generarReclamo")->name("estado_pago_reclamo");
     });
 });

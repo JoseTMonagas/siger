@@ -109,6 +109,11 @@ Vue.component(
   require("./components/ExcelExportComponent.vue").default
 );
 
+Vue.component(
+  "concepto-component",
+  require("./components/ConceptoComponent.vue").default
+);
+
 Vue.use(Tabs);
 
 const app = new Vue({

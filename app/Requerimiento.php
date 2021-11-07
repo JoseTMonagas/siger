@@ -159,7 +159,7 @@ class Requerimiento extends Model
             'userable',
             ['App\CompassRole'],
             function ($query) {
-                $query->where('name', 'like', 'Compras')->orWhere('name', 'like', 'Despacho');
+                $query->where('name', 'like', 'Compras');
             }
         )->get();
         foreach ($compassUsers as $user) {

@@ -106,8 +106,16 @@
                                             <td>{{ $guia->nombre_centro  }}</td>
                                             <td>{{ $guia->fecha  }}</td>
                                             <td>{{ number_format($guia->neto, 0)  }}</td>
-                                            <td>{{ $guia->getObservacionesCountById(3)  }}</td>
-                                            <td>{{ $guia->getObservacionesCountById(2)  }}</td>
+                                            <td>
+                                                <a href="{{ route("estado_pago_concepto", [$guia, 3])  }}">
+                                                    {{ $guia->getObservacionesCountById(3)  }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route("estado_pago_concepto", [$guia, 2])  }}">
+                                                    {{ $guia->getObservacionesCountById(2)  }}
+                                                </a>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -143,10 +151,26 @@
                                             <td>{{ $guia->nombre_centro  }}</td>
                                             <td>{{ $guia->fecha  }}</td>
                                             <td>{{ number_format($guia->neto, 0)  }}</td>
-                                            <td>{{ $guia->getObservacionesCountById(4)  }}</td>
-                                            <td>{{ $guia->getObservacionesCountById(5)  }}</td>
-                                            <td>{{ $guia->getObservacionesCountById(6)  }}</td>
-                                            <td>{{ $guia->getObservacionesCountById(7)  }}</td>
+                                            <td>
+                                                <a href="{{ route("estado_pago_concepto", [$guia, 4])  }}">
+                                                    {{ $guia->getObservacionesCountById(4)  }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route("estado_pago_concepto", [$guia, 5])  }}">
+                                                    {{ $guia->getObservacionesCountById(5)  }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route("estado_pago_concepto", [$guia, 6])  }}">
+                                                    {{ $guia->getObservacionesCountById(6)  }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route("estado_pago_concepto", [$guia, 7])  }}">
+                                                    {{ $guia->getObservacionesCountById(7)  }}
+                                                </a>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>

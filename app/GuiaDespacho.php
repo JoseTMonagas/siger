@@ -27,7 +27,7 @@ class GuiaDespacho extends Model
 
     public function productos()
     {
-        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido");
+        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc");
     }
 
     public function rechazos()
@@ -81,6 +81,13 @@ class GuiaDespacho extends Model
         $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->get();
 
         return $productos->count();
+    }
+
+    public function getProductosByObservacionesId(int $id)
+    {
+        $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->get();
+
+        return $productos;
     }
 
 
