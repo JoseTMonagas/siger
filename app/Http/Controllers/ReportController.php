@@ -372,36 +372,20 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
-                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                        $query->whereDate("fecha", ">=", $inicio)
-                            ->whereDate("fecha", "<=", $fin)
-                            ->whereNotNull("febos_id");
-                    })
                     ->orderBy("created_at")
                     ->get();
-                $reqEmpresas->load("guiasDespacho", "guiasDespacho.productos");
                 $requerimientos->push($reqEmpresas);
             }
             $requerimientos = $requerimientos->flatten();
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
                 ->orderBy("created_at")
                 ->get();
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
-                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
-                    $query->whereDate("fecha", ">=", $inicio)
-                        ->whereDate("fecha", "<=", $fin)
-                        ->whereNotNull("febos_id");
-                })
                 ->orderBy("created_at")
                 ->get();
         }
@@ -418,12 +402,10 @@ class ReportController extends Controller
     public function cartasRequerimientoGenerate(Requerimiento $requerimiento)
     {
         $cliente = "{$requerimiento->centro->empresa->razon_social}: {$requerimiento->centro->nombre}";
-        $anyGuiaDespacho = $requerimiento->guiasDespacho->first();
         $excelData = [
             ["CLIENTE", $cliente],
             ["AREA", $requerimiento->centro->zona],
             ["FECHA DE SOLICITUD", $requerimiento->created_at],
-            ["FECHA DE ENTREGA", $anyGuiaDespacho->fecha],
             ["Centro", "SKU", "Familia", "Detalle", "Marca", "Cantidad", "Precio Venta", "Total", "Observaciones"]
         ];
 

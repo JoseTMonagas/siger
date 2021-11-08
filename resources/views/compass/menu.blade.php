@@ -9,6 +9,7 @@
     <div class="dropdown-menu">
         <a class="dropdown-item" href="{{route('pedidos.indexEmpresa')}}">Lista</a>
         @if (Auth::user()->userable->name === 'Compras')
+        <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta de Trabajo</a>
         <a class="dropdown-item" href="{{ route('compass.pedidos.verificar')}}">Verificar</a>
         @endif
         @if (Auth::user()->userable->name === 'Despacho')
@@ -97,7 +98,7 @@
         <a class="dropdown-item" href="{{route('reportes.productos')}}">Rebaja de Productos</a>
         <a class="dropdown-item" href="{{route('reportes.estadoPago')}}">Estados de Pago</a>
         <a class="dropdown-item" href="{{route('reportes.guias.view')}}">Historial de Guias de Despacho</a>
-        <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta Requerimiento</a>
+        <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta de Trabajo</a>
     </div>
 </li>
 <li class="nav-item">
