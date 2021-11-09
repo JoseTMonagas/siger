@@ -106,7 +106,7 @@
                                 </a>
                             </td>
                             <td>{{ $requerimiento->created_at  }}</td>
-                            <td>{{ $requerimiento->getTotal() }}</td>
+                            <td>{{ number_format($requerimiento->getTotal(), 0) }}</td>
                             <td>
                                 <form method="POST" action="{{ route('reportes.carta.download', $requerimiento) }}">
                                     @csrf
