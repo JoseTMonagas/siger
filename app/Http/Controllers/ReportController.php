@@ -372,6 +372,8 @@ class ReportController extends Controller
             foreach ($empresas as $empresa) {
                 $empresa = \App\Empresa::find($empresa);
                 $reqEmpresas = $empresa->requerimientos()
+                    ->whereDate("requerimientos.created_at", ">=", $inicio)
+                    ->whereDate("requerimientos.created_at", "<=", $fin)
                     ->orderBy("created_at")
                     ->get();
                 $requerimientos->push($reqEmpresas);
@@ -380,12 +382,16 @@ class ReportController extends Controller
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
+                ->whereDate("created_at", ">=", $inicio)
+                ->whereDate("created_at", "<=", $fin)
                 ->orderBy("created_at")
                 ->get();
         } elseif (isset($request->zonas)) {
             $abastecimientos = explode(",", $request->zonas);
             $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
+                ->whereDate("created_at", ">=", $inicio)
+                ->whereDate("created_at", "<=", $fin)
                 ->orderBy("created_at")
                 ->get();
         }
@@ -420,7 +426,7 @@ class ReportController extends Controller
                 $producto->marca,
                 $producto->pivot->real,
                 $producto->venta,
-                ($producto->pivot->real * $producto->venta),
+                (($producto->pivot->real ?? $producto->pivot->cantidad) * $producto->venta),
                 $producto->pivot->observacion,
             ];
         }
