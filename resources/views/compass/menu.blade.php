@@ -9,10 +9,10 @@
     <div class="dropdown-menu">
         <a class="dropdown-item" href="{{route('pedidos.indexEmpresa')}}">Lista</a>
         @if (Auth::user()->userable->name === 'Compras')
-        <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta de Trabajo</a>
         <a class="dropdown-item" href="{{ route('compass.pedidos.verificar')}}">Verificar</a>
         @endif
         @if (Auth::user()->userable->name === 'Despacho')
+        <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta de Trabajo</a>
         <a class="dropdown-item" href="{{ route('compass.pedidos.cajasIndex')}}">Armar Cajas</a>
         <a class="dropdown-item" href="{{ route('compass.pedidos.programarDespachos')}}">Programar Despachos</a>
         <a class="dropdown-item" href="{{ route('compass.pedidos.despachar')}}">Despachar</a>
