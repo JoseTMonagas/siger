@@ -79,7 +79,7 @@
 
                 @isset($requerimientos)
                 @if($requerimientos->count() > 0)
-                <table class="table table-sm">
+                <table class="table table-sm" id="datatable">
                     <thead>
                         <tr>
                             <th>Centro</th>
