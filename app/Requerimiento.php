@@ -178,7 +178,10 @@ class Requerimiento extends Model
     {
         $productos = $this->productos()->get();
         $total = $productos->map(function ($producto) {
-            return $producto->pivot->real * $producto->pivot->precio;
+            if ($producto->pivot->real) {
+                return $producto->pivot->real * $producto->pivot->precio;
+            }
+            return $producto->pivot->cantidad * $producto->pivot->precio;
         })->reduce(function ($carry, $item) {
             return ($carry + $item);
         });
