@@ -98,6 +98,34 @@ class GuiaDespacho extends Model
         });
     }
 
+    public function getSinNotaCreditoAttribute()
+    {
+        return $this->productos->filter(function ($producto) {
+            return !$producto->pivot->genera_nc;
+        })->reduce(function ($carry, $producto) {
+            return $carry + ($producto->pivot->precio * $producto->pivot->real);
+        });
+    }
+
+
+    public function getNotaCreditoAttribute()
+    {
+        return $this->productos->filter(function ($producto) {
+            return $producto->pivot->genera_nc;
+        })->reduce(function ($carry, $producto) {
+            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            if ($producto->pivot->tipo_observacion_id == 2) {
+                $cantidad = 0;
+            }
+            return $carry + ($producto->pivot->precio * $cantidad);
+        });
+    }
+
+    public function getLiquidacionAttribute()
+    {
+        return $this->neto - $this->notaCredito;
+    }
+
     public function getMontoRechazosAttribute()
     {
         if ($this->rechazos->count() > 0) {

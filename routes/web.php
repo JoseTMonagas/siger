@@ -345,5 +345,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post("{guiaDespacho}/producto", "EstadoPagoController@conceptoStore")->name("estado_pago_concepto_store");
         Route::post("{guiaDespacho}/producto/{producto?}", "EstadoPagoController@generarReclamo")->name("estado_pago_reclamo");
+
+        Route::get("resumen", "EstadoPagoController@resumen")->name("estado_pago_resumen");
+        Route::post("resumen", "EstadoPagoController@generarResumen")->name("estado_pago_generar_resumen");
     });
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Centro;
 use App\Empresa;
 use App\GuiaDespacho;
 use App\Mail\Reclamo;
@@ -53,14 +54,17 @@ class EstadoPagoController extends Controller
             $guias = $guias->whereDate("fecha", "<=", $fin->format("Y-m-d"));
         }
 
+        $centros = [];
         if (null !== $request->input("empresa_id")) {
             $empresa = Empresa::find($request->input("empresa_id"));
             $centros = $empresa->centros;
-
-            $guias = $guias->whereHas("requerimiento", function (Builder $query) use ($centros) {
-                $query->whereIn("centro_id", $centros->modelKeys());
-            });
+        } else {
+            $empresa = Auth::user()->userable;
+            $centros = $empresa->centros;
         }
+        $guias = $guias->whereHas("requerimiento", function (Builder $query) use ($centros) {
+            $query->whereIn("centro_id", $centros->modelKeys());
+        });
 
         $guias = $guias->orderBy("nombre_centro", "asc")->get();
 
@@ -124,5 +128,91 @@ class EstadoPagoController extends Controller
         }
         Mail::to($emails)->send(new EstadoPagoActualizado($guiaDespacho, $tipoObservacion));
         return response()->json();
+    }
+
+    public function resumen(Request $request)
+    {
+        $user = Auth::user();
+        $empresas = null;
+        $centros = null;
+        $zonas = null;
+
+        if ($user->userable instanceof \App\CompassRole) {
+            $empresas = Empresa::all();
+            $centros = Centro::all();
+            $zonas =  \App\Abastecimiento::all();
+        } else {
+            $centros = $user->userable->centros;
+        }
+
+
+        return view("estado_pago.resumen", compact("empresas", "centros", "zonas"));
+    }
+
+    public function generarResumen(Request $request)
+    {
+        $inicio = $request->input("inicio");
+        $fin = $request->input("fin");
+
+        $requerimientos = collect();
+
+        if (isset($request->empresas)) {
+            $empresas = explode(",", $request->empresas);
+            foreach ($empresas as $empresa) {
+                $empresa = \App\Empresa::find($empresa);
+                $reqEmpresas = $empresa->requerimientos()
+                    ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                        $query->whereDate("fecha", ">=", $inicio)
+                            ->whereDate("fecha", "<=", $fin)
+                            ->whereNotNull("febos_id");
+                    })
+                    ->orderBy("created_at")
+                    ->get();
+                $reqEmpresas->load("guiasDespacho");
+                $requerimientos->push($reqEmpresas);
+            }
+            $requerimientos = $requerimientos->flatten();
+        } elseif (isset($request->centros)) {
+            $centros = explode(",", $request->centros);
+            $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
+            $requerimientos->load("guiasDespacho");
+        } elseif (isset($request->zonas)) {
+            $abastecimientos = explode(",", $request->zonas);
+            $centros = \App\Centro::whereIn("zona", $abastecimientos)->pluck("id")->toArray();
+            $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
+                ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                    $query->whereDate("fecha", ">=", $inicio)
+                        ->whereDate("fecha", "<=", $fin)
+                        ->whereNotNull("febos_id");
+                })
+                ->orderBy("created_at")
+                ->get();
+            $requerimientos->load("guiasDespacho");
+        }
+
+        $guiasDespacho = GuiaDespacho::whereIn("requerimiento_id", $requerimientos->pluck("id"))->distinct()->get();
+
+        $user = Auth::user();
+        $empresas = null;
+        $centros = null;
+        $zonas = null;
+
+        if ($user->userable instanceof \App\CompassRole) {
+            $empresas = Empresa::all();
+            $centros = Centro::all();
+            $zonas =  \App\Abastecimiento::all();
+        } else {
+            $centros = $user->userable->centros;
+        }
+
+
+        return view("estado_pago.resumen", compact("empresas", "centros", "zonas", "guiasDespacho"));
     }
 }
