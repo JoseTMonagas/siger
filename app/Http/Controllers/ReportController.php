@@ -424,7 +424,7 @@ class ReportController extends Controller
                 $producto->familia,
                 $producto->detalle,
                 $producto->marca,
-                $producto->pivot->real,
+                ($producto->pivot->real ?? $producto->pivot->cantidad),
                 $producto->venta,
                 (($producto->pivot->real ?? $producto->pivot->cantidad) * $producto->venta),
                 $producto->pivot->observacion,
