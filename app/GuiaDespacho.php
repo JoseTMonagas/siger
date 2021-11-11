@@ -387,7 +387,8 @@ Monto Total Otra Moneda                          :\n";
 
     private function detalleProductos()
     {
-        $detalles = $this->productos->map(function ($producto) {
+        $productos = $this->productos()->orderBy("detalle")->get();
+        $detalles = $productos->map(function ($producto) {
             if ($producto->pivot->real > 0) {
                 $sku = str_pad($producto->sku, 35);
                 $detalle = str_pad($producto->detalle, 80);
