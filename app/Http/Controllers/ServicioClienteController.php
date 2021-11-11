@@ -20,14 +20,18 @@ class ServicioClienteController extends Controller
 
         if ($request->hasFile("minuta") && $request->file("minuta")->isValid()) {
             $request->file("minuta")->storeAs(
-                'rrhh', "minuta", "real_public"
+                'rrhh',
+                "minuta.pdf",
+                "real_public"
             );
             $status["minuta"] = true;
         }
 
         if ($request->hasFile("saludable") && $request->file("saludable")->isValid()) {
             $request->file("saludable")->storeAs(
-                'rrhh', "saludable", "real_public"
+                'rrhh',
+                "saludable.pdf",
+                "real_public"
             );
             $status["saludable"] = true;
         }
