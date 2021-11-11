@@ -88,9 +88,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::group(['prefix' => 'pedidos'], function () {
 
             Route::group(['middleware' => ['type:\App\Centro']], function () {
-                Route::get('crear', 'RequerimientoController@create')->name('requerimientos.create');
-                Route::get('formato', 'RequerimientoController@descargaFormato')->name('requerimientos.formato');
-                Route::post('store', 'RequerimientoController@store')->name('requerimientos.store');
+                Route::middleware("create")->group(function () {
+                    Route::get('crear', 'RequerimientoController@create')->name('requerimientos.create');
+                    Route::get('formato', 'RequerimientoController@descargaFormato')->name('requerimientos.formato');
+                    Route::post('store', 'RequerimientoController@store')->name('requerimientos.store');
+                });
 
                 Route::get(
                     'recepcion/{requerimiento}',
@@ -106,12 +108,14 @@ Route::group(['middleware' => 'auth'], function () {
 
 
             Route::group(['middleware' => ['type:\App\Empresa']], function () {
-                Route::get('validar-pedidos', 'RequerimientoController@validarPedidos')->name('pedidos.validar');
+                Route::middleware("validar")->group(function () {
+                    Route::get('validar-pedidos', 'RequerimientoController@validarPedidos')->name('pedidos.validar');
 
-                Route::post('aceptar', 'RequerimientoController@aceptar')->name('pedidos.aceptar');
-                Route::post('rechazar', 'RequerimientoController@rechazar')->name('pedidos.rechazar');
-                Route::post('aceptar-todos', 'RequerimientoController@aceptarTodos')->name('pedidos.aceptarTodos');
-                Route::post('rechazar-todos', 'RequerimientoController@rechazarTodos')->name('pedidos.rechazarTodos');
+                    Route::post('aceptar', 'RequerimientoController@aceptar')->name('pedidos.aceptar');
+                    Route::post('rechazar', 'RequerimientoController@rechazar')->name('pedidos.rechazar');
+                    Route::post('aceptar-todos', 'RequerimientoController@aceptarTodos')->name('pedidos.aceptarTodos');
+                    Route::post('rechazar-todos', 'RequerimientoController@rechazarTodos')->name('pedidos.rechazarTodos');
+                });
 
                 Route::get('editar/{requerimiento}', 'RequerimientoController@edit')->name('requerimientos.edit');
                 Route::put('actualizar/{requerimiento}', 'RequerimientoController@update')->name('requerimientos.update');
