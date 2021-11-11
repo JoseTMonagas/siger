@@ -412,21 +412,23 @@ class ReportController extends Controller
             ["CLIENTE", $cliente],
             ["AREA", $requerimiento->centro->zona],
             ["FECHA DE SOLICITUD", $requerimiento->created_at],
-            ["Centro", "SKU", "Familia", "Detalle", "Marca", "Cantidad", "Precio Venta", "Total", "Observaciones"]
+            ["Centro", "SKU", "Familia", "Detalle", "Marca", "Formato", "Cantidad", "Precio Venta", "Total", "Observaciones"]
         ];
 
         $productos = $requerimiento->productos()->get();
 
         foreach ($productos as $producto) {
+            $cantidad = $producto->pivot->real ?? $producto->pivot->cantidad;
             $excelData[] = [
                 $requerimiento->centro->nombre,
                 $producto->sku,
                 $producto->familia,
                 $producto->detalle,
                 $producto->marca,
-                ($producto->pivot->real ?? $producto->pivot->cantidad),
+                $producto->formato,
+                $cantidad,
                 $producto->venta,
-                (($producto->pivot->real ?? $producto->pivot->cantidad) * $producto->venta),
+                ($cantidad * $producto->venta),
                 $producto->pivot->observacion,
             ];
         }
