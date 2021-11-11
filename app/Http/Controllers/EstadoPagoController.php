@@ -88,8 +88,12 @@ class EstadoPagoController extends Controller
 
 
 
+        $empresas = [];
+        if (Auth::user()->userable instanceof \App\CompassRole) {
+            $empresas = Empresa::all();
+        }
 
-        return view("estado_pago.general", compact("aceptadas", "rechazadas", "observadas"));
+        return view("estado_pago.general", compact("aceptadas", "rechazadas", "observadas", "empresas"));
     }
 
     public function concepto(GuiaDespacho $guiaDespacho, TipoObservacion $tipoObservacion)
