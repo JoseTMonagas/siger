@@ -122,18 +122,7 @@
         <a class="dropdown-item" href="{{route('reportes.enviados')}}">
             Productos despachados
         </a>
-        <a class="dropdown-item" href="{{route('reportes.recibidos')}}">
-            Observaciones pedidos
-        </a>
-        <a class="dropdown-item" href="{{route('reportes.cierres')}}">
-            Cierre de Pedidos
-        </a>
-        <a class="dropdown-item" href="{{route('reportes.nota-credito')}}">
-            Productos Nota Credito
-        </a>
-        <a class="dropdown-item" href="{{route('reportes.carga-empresa')}}">
-            Productos Carga Empresa
-        </a>
+        <a class="dropdown-item" href="{{route('estado_pago_general')}}">Estados de Pago</a>
     </div>
 </li>
 @endif
