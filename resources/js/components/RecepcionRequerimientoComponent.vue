@@ -1,27 +1,12 @@
 <template>
   <v-stepper v-model="currentStep" non-linear vertical>
-    <v-stepper-header>
-      <v-stepper-step
-        v-for="(guiaDespacho, index) in guiasDespacho"
-        :key="guiaDespacho.id"
-        editable
-        :step="index"
-      >
-        <strong>
-          {{ guiaDespacho.fecha }}
-          - {{ guiaDespacho.nombre_centro }} - {{ guiaDespacho.folio }}
-        </strong>
+    <template v-for="(guiaDespacho, index) in guiasDespacho">
+      <v-stepper-step editable :step="index">
+        {{ guiaDespacho.fecha }}
+        - {{ guiaDespacho.nombre_centro }} - {{ guiaDespacho.folio }}
       </v-stepper-step>
-      <v-stepper-step :step="lastStep" editable>
-        <strong>Recibir Pedido</strong>
-      </v-stepper-step>
-    </v-stepper-header>
-    <v-stepper-items>
-      <v-stepper-content
-        v-for="(guiaDespacho, indexGuias) in guiasDespacho"
-        :key="guiaDespacho.febos_id"
-        :step="indexGuias"
-      >
+      <v-divider></v-divider>
+      <v-stepper-content :step="index">
         <div class="container-fluid">
           <div class="row">
             <div class="col-md">
@@ -42,18 +27,24 @@
                       v-for="(producto,
                       indexProductos) in guiaDespacho.productos"
                       :key="indexProductos"
-                      :class="getContextClass(indexGuias, indexProductos)"
+                      :class="getContextClass(index, indexProductos)"
                     >
                       <td>{{ producto.sku }}</td>
                       <td>{{ producto.detalle }}</td>
                       <td>{{ producto.pivot.real }}</td>
                       <td>
-                        <select class="form-control" v-model="producto.pivot.tipo_observacion_id">
+                        <select
+                          class="form-control"
+                          v-model="producto.pivot.tipo_observacion_id"
+                        >
                           <option
                             v-for="observacion in observaciones"
                             :value="observacion.id"
-                            :key="`${indexGuias}-${indexProductos}-${observacion.id}`"
-                          >{{ observacion.nombre }}</option>
+                            :key="
+                              `${index}-${indexProductos}-${observacion.id}`
+                            "
+                            >{{ observacion.nombre }}</option
+                          >
                         </select>
                         <small>{{ getObservacionLabel(producto) }}</small>
                       </td>
@@ -78,50 +69,62 @@
           </div>
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn color="primary" @click="currentStep = ++indexGuias">Continuar</v-btn>
+              <v-btn color="primary" @click="currentStep = ++index"
+                >Continuar</v-btn
+              >
             </div>
           </div>
         </div>
       </v-stepper-content>
-      <v-stepper-content :step="lastStep">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md">
-              <strong>Los siguientes productos seran rechazados:</strong>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md">
-              <v-simple-table fixed-header length="700">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th>Folio Guia</th>
-                      <th>Detalle</th>
-                      <th>Motivo</th>
-                      <th>Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(summary, index) in summary" :key="index">
-                      <td>{{ summary.guia.folio }}</td>
-                      <td>{{ summary.product.detalle }}</td>
-                      <td>{{ getObservacionById(summary.product.pivot.tipo_observacion_id) }}</td>
-                      <td>{{ summary.product.pivot.cantidad_recibido }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-            </div>
-          </div>
-          <div class="row justify-content-around">
-            <div class="col-md-2">
-              <v-btn @click="save" color="success">Aceptar y Finalizar</v-btn>
-            </div>
+    </template>
+    <v-stepper-step editable :step="lastStep">
+      <strong>Recibir Pedidos</strong>
+    </v-stepper-step>
+    <v-divider></v-divider>
+    <v-stepper-content :step="lastStep">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md">
+            <strong>Los siguientes productos seran rechazados:</strong>
           </div>
         </div>
-      </v-stepper-content>
-    </v-stepper-items>
+        <div class="row">
+          <div class="col-md">
+            <v-simple-table fixed-header length="700">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th>Folio Guia</th>
+                    <th>Detalle</th>
+                    <th>Motivo</th>
+                    <th>Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(summary, index) in summary" :key="index">
+                    <td>{{ summary.guia.folio }}</td>
+                    <td>{{ summary.product.detalle }}</td>
+                    <td>
+                      {{
+                        getObservacionById(
+                          summary.product.pivot.tipo_observacion_id
+                        )
+                      }}
+                    </td>
+                    <td>{{ summary.product.pivot.cantidad_recibido }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </div>
+        </div>
+        <div class="row justify-content-around">
+          <div class="col-md-2">
+            <v-btn @click="save" color="success">Aceptar y Finalizar</v-btn>
+          </div>
+        </div>
+      </div>
+    </v-stepper-content>
   </v-stepper>
 </template>
 <script>
@@ -129,16 +132,16 @@ export default {
   props: {
     guiasDespacho: {
       type: Array,
-      required: true,
+      required: true
     },
     storeRoute: {
       type: String,
-      required: true,
+      required: true
     },
     observaciones: {
       type: Array,
-      required: true,
-    },
+      required: true
+    }
   },
   mounted() {
     for (let i = 0; i < this.guiasDespacho.length; i++) {
@@ -149,25 +152,25 @@ export default {
   computed: {
     lastStep() {
       return this.guiasDespacho.length;
-    },
+    }
   },
   watch: {
     currentStep() {
       this.summary = this.summaryObservacion();
-    },
+    }
   },
   data() {
     return {
       currentStep: 0,
       productosEditados: [],
       tiposObservaciones: [],
-      summary: undefined,
+      summary: undefined
     };
   },
   methods: {
     getContextClass(indexGuias, indexProductos) {
-      const rechazado =
-        this.productosEditados[indexGuias][indexProductos].rechazado;
+      const rechazado = this.productosEditados[indexGuias][indexProductos]
+        .rechazado;
 
       if (rechazado) {
         return "table-warning";
@@ -190,7 +193,7 @@ export default {
     },
     getObservacionLabel(producto) {
       const observacion = this.observaciones.find(
-        (observacion) => observacion.id == producto.pivot.tipo_observacion_id
+        observacion => observacion.id == producto.pivot.tipo_observacion_id
       );
 
       if (observacion !== undefined) {
@@ -206,14 +209,14 @@ export default {
     validateStep(indexGuia) {
       if (this.productosEditados.length > 0 && indexGuia > -1) {
         return this.productosEditados[indexGuia].some(
-          (producto) => producto.rechazado && producto.motivo == ""
+          producto => producto.rechazado && producto.motivo == ""
         );
       }
       return true;
     },
     getFolioByProductId(productId) {
-      const guia = this.guiasDespacho.find((guia) =>
-        guia.productos.some((producto) => producto.id == productId)
+      const guia = this.guiasDespacho.find(guia =>
+        guia.productos.some(producto => producto.id == productId)
       );
 
       if (guia != undefined) {
@@ -222,8 +225,8 @@ export default {
       return "";
     },
     getGuiaIdByProductId(productId) {
-      const guia = this.guiasDespacho.find((guia) =>
-        guia.productos.some((producto) => producto.id == productId)
+      const guia = this.guiasDespacho.find(guia =>
+        guia.productos.some(producto => producto.id == productId)
       );
 
       if (guia != undefined) {
@@ -233,7 +236,7 @@ export default {
     },
     getObservacionById(id) {
       const observacion = this.observaciones.find(
-        (observacion) => observacion.id == id
+        observacion => observacion.id == id
       );
 
       if (observacion !== undefined) {
@@ -245,7 +248,7 @@ export default {
       let rechazados = this.summaryObservacion();
       axios
         .post(this.storeRoute, { rechazados })
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -263,13 +266,13 @@ export default {
           }
           console.log(error.config);
         })
-        .then((resp) => {
+        .then(resp => {
           if (resp.status == 201) {
             alert("Guardado exitosamente");
             window.location.href = resp.data;
           }
         });
-    },
-  },
+    }
+  }
 };
 </script>
