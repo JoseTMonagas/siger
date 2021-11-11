@@ -23,9 +23,9 @@
 <body class="bg-grey-lightest font-sans leading-normal tracking-normal">
     <div id="app">
         <v-app>
-            <header class="navbar navbar-dark bg-dark flex-md-nowrap p-0 shadow">
+            <header class="navbar navbar-dark bg-gray-200 flex-md-nowrap px-4 py-1 shadow z-10">
                 @auth
-                <button class="btn btn-outline-light" type="button" data-toggle="collapse" data-target="#sidenav" aria-expanded="false" aria-controls="sidenav" id="sidenavBtn">
+                <button class="btn btn-outline-dark" type="button" data-toggle="collapse" data-target="#sidenav" aria-expanded="false" aria-controls="sidenav" id="sidenavBtn">
                     <i class="fas fa-bars"></i>
                 </button>
                 @endif
@@ -64,13 +64,11 @@
             <div class="container-fluid">
                 <div class="row">
                     <div id="sidenav" class="col-md-2 collapse">
-                        <nav class="d-none d-md-block bg-light sidebar">
-                            <div class="sidebar-sticky">
-                                <div class="nav flex-column">
-                                    @hasSection('nav-menu')
-                                    @yield('nav-menu')
-                                    @endif
-                                </div>
+                        <nav class="d-none d-md-block bg-light sidebar pt-8">
+                            <div class="nav flex-column">
+                                @hasSection('nav-menu')
+                                @yield('nav-menu')
+                                @endif
                             </div>
                         </nav>
                     </div>
