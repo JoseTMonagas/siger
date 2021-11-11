@@ -24,20 +24,30 @@ class TransporteController extends Controller
         $form = $request->validated();
         $despacho = Transporte::create($form);
 
-        foreach($form["requerimientos"] as $requerimientoId) {
-            $requerimiento = Requerimiento::find($requerimientoId);
-            if ($requerimiento) {
-                $requerimiento->transporte()->associate($despacho);
-                $requerimiento->save();
-            }
-        }
-
         $msg = [
             "meta" => [
-                "title" => "¡Despacho Programado Exitosamente!",
-                "msg" => "El Despacho ha sido programado exitosamente"
+                "title" => "Error!",
+                "msg" => "No hay requerimientos seleccionados"
             ]
         ];
+
+        if (isset($form["requerimientos"])) {
+            foreach ($form["requerimientos"] as $requerimientoId) {
+                $requerimiento = Requerimiento::find($requerimientoId);
+                if ($requerimiento) {
+                    $requerimiento->transporte()->associate($despacho);
+                    $requerimiento->save();
+                }
+            }
+
+            $msg = [
+                "meta" => [
+                    "title" => "¡Despacho Programado Exitosamente!",
+                    "msg" => "El Despacho ha sido programado exitosamente"
+                ]
+            ];
+        }
+
 
         return back()->with(compact('msg'));
     }
@@ -67,5 +77,4 @@ class TransporteController extends Controller
 
         return response()->json($msg);
     }
-
 }
