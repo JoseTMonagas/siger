@@ -9,7 +9,7 @@ class Producto extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['sku', 'detalle', 'costo', 'venta', 'desde', 'hasta', 'empresa_id', 'familia', 'marca', 'reemplazo'];
+    protected $fillable = ['sku', 'detalle', 'costo', 'venta', 'desde', 'hasta', 'empresa_id', 'familia', 'marca', 'reemplazo', "formato"];
     protected $appends = ["editRoute", "DeleteRoute"];
     /**
      * Devuelve los requerimientos que contienen a ese Producto

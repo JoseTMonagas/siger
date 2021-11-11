@@ -33,6 +33,7 @@ class ProductoImport implements ToCollection, WithHeadingRow
             $hasta = null;
             $familia = null;
             $marca = null;
+            $formato = null;
             $reemplazo = false;
 
             if (isset($row["sku"])) {
@@ -105,6 +106,10 @@ class ProductoImport implements ToCollection, WithHeadingRow
                 $reemplazo = true;
             }
 
+            if (isset($row["formato"])) {
+                $formato = $row["formato"];
+            }
+
             $this->empresa->productos()->create([
                 "sku" => $sku,
                 "detalle" => $detalle,
@@ -114,7 +119,8 @@ class ProductoImport implements ToCollection, WithHeadingRow
                 "hasta" => $hasta,
                 "marca" => $marca,
                 "familia" => $familia,
-                "reemplazo" => $reemplazo
+                "reemplazo" => $reemplazo,
+                "formato" => $formato
             ]);
         }
     }

@@ -8,7 +8,6 @@ use App\Http\Requests\ProductoForm;
 use App\Imports\ProductoImport;
 use App\Producto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ProductoController extends Controller
@@ -71,13 +70,13 @@ class ProductoController extends Controller
         $productos = $empresa->productosVigentes;
 
         $excelData = [
-            ["sku", "familia", "detalle", "marca", "costo", "venta", "desde", "hasta", "reemplazo"],
+            ["sku", "familia", "detalle", "marca", "formato", "costo", "venta", "desde", "hasta", "reemplazo"],
         ];
 
         if ($productos->count() > 0) {
             foreach ($productos as $producto) {
                 $excelData[] = [
-                    $producto->sku, $producto->familia,  $producto->detalle, $producto->marca, $producto->costo,
+                    $producto->sku, $producto->familia,  $producto->detalle, $producto->marca, $producto->formato, $producto->costo,
                     $producto->venta, $producto->desde, $producto->hasta, $producto->reemplazo ? "Si" : ""
                 ];
             }
@@ -138,7 +137,7 @@ class ProductoController extends Controller
     public function formatoCargaMasiva()
     {
         $excelData = [
-            ["sku",  "familia", "detalle", "marca", "costo", "venta", "desde", "hasta", "reemplazo"]
+            ["sku",  "familia", "detalle", "marca", "formato", "costo", "venta", "desde", "hasta", "reemplazo"]
         ];
 
         $export = new ArrayExport($excelData);
