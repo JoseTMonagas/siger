@@ -80,6 +80,11 @@ Route::group(['middleware' => 'auth'], function () {
         "RechazoController@show"
     )->name("rechazos.show");
 
+    Route::post(
+        "observaciones/{requerimiento}",
+        "RechazoController@showExport"
+    )->name("rechazos.export");
+
     // Rutas del Cliente
     Route::group(['prefix' => 'cliente', 'middleware' => ['cliente']], function () {
 

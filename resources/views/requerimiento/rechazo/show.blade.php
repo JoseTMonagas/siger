@@ -15,15 +15,18 @@
         Productos con Observaciones en Guia de Despachos
     </h3>
     <div class="card-body">
-        <div class="row">
-
-        </div>
         <div class="row justify-content-center align-items-center">
-            <div class="col-md-10">
+            <div class="col-md-12">
+                <form method="POST" action="{{ route('rechazos.export', $requerimiento) }}">
+                    @csrf
+                    <button class="btn btn-primary mb-2">Exportar a Excel</button>
+                </form>
                 <index-component :headers="[
                 { text: 'Folio Guia', value: 'guia.folio' },
                 { text: 'Detalle', value: 'producto.detalle' },
-                { text: 'Cantidad', value: 'producto.pivot.cantidad_recibido' },
+                { text: 'Despachado', value: 'producto.pivot.real' },
+                { text: 'Recibido', value: 'producto.pivot.cantidad_recibido' },
+                { text: 'Tipo', value: 'motivo.estado' },
                 { text: 'Motivo', value: 'motivo.nombre' },
                 ]" :items='@json($observados)'></index-component>
             </div>
