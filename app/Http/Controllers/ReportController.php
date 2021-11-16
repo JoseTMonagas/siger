@@ -400,6 +400,49 @@ class ReportController extends Controller
         $centros = \App\Centro::all();
         $zonas = \App\Abastecimiento::all();
 
+        if ($request->input("generate")) {
+            $excelData = [
+                [
+                    "Fecha Solicitud",
+                    "Cliente",
+                    "Centro",
+                    "Area",
+                    "SKU",
+                    "Familia",
+                    "Detalle",
+                    "Marca",
+                    "Formato",
+                    "Cantidad",
+                    "Precio Venta",
+                    "Total",
+                    "Observaciones"
+                ]
+            ];
+            foreach ($requerimientos as $requerimiento) {
+                foreach ($requerimiento->productos as $producto) {
+                    $cantidad = $producto->pivot->real ?? $producto->pivot->cantidad;
+                    $excelData[] = [
+                        $requerimiento->created_at,
+                        $requerimiento->centro->empresa->razon_social,
+                        $requerimiento->centro->nombre,
+                        $requerimiento->centro->zona,
+                        $producto->sku,
+                        $producto->familia,
+                        $producto->detalle,
+                        $producto->marca,
+                        $producto->formato,
+                        $cantidad,
+                        $producto->venta,
+                        ($cantidad * $producto->venta),
+                        $producto->pivot->observacion,
+                    ];
+                }
+            }
+
+            $export = new ArrayExport($excelData);
+            return Excel::download($export, "Consolidado de requerimientos.xlsx");
+        }
+
 
         return view("reporte/historial_requerimientos")
             ->with(compact("empresas", "centros", "zonas", "requerimientos"));

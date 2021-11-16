@@ -19,20 +19,22 @@
                 <form action="{{ route('reportes.carta.filter') }}" method="POST" accept-charset="utf-8">
                     @csrf
 
-                    <div class="form-group row">
-                        <label class="col-sm-2" for="inicio">Fecha de Inicio:</label>
-                        <span class="col-sm-6">
-                            <input class="form-control" required type="date" name="inicio">
-                            <p class="text-muted">Obligatorio</p>
-                        </span>
-                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-2 d-flex flex-col">
+                            <label class="" for="inicio">Fecha de Inicio:</label>
+                            <span class="">
+                                <input class="form-control" required type="date" name="inicio">
+                                <p class="text-muted">Obligatorio</p>
+                            </span>
+                        </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2" for="fin">Fecha de Fin:</label>
-                        <span class="col-sm-6">
-                            <input class="form-control" required type="date" name="fin">
-                            <p class="text-muted">Obligatorio</p>
-                        </span>
+                        <div class="form-group col-md-2 d-flex flex-col">
+                            <label class="" for="fin">Fecha de Fin:</label>
+                            <span class="">
+                                <input class="form-control" required type="date" name="fin">
+                                <p class="text-muted">Obligatorio</p>
+                            </span>
+                        </div>
                     </div>
 
                     <v-expansion-panels>
@@ -74,7 +76,8 @@
                         </v-expansion-panel>
                     </v-expansion-panels>
 
-                    <button class="btn btn-primary my-5">Ver Historial</button>
+                    <button type="submit" class="btn btn-primary my-5">Ver Historial</button>
+                    <button type="submit" name="generate" value="1" class="btn btn-warning mx-2 my-5">Generar Excel Consolidado</button>
                 </form>
 
                 @isset($requerimientos)
