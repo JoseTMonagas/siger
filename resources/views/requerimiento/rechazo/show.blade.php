@@ -28,6 +28,7 @@
                 { text: 'Recibido', value: 'producto.pivot.cantidad_recibido' },
                 { text: 'Tipo', value: 'motivo.estado' },
                 { text: 'Motivo', value: 'motivo.nombre' },
+                { text: 'Comentarios', value: 'producto.pivot.observacion' },
                 ]" :items='@json($observados)'></index-component>
             </div>
 

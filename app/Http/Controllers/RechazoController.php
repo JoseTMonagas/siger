@@ -30,7 +30,7 @@ class RechazoController extends Controller
     public function showExport(\App\Requerimiento $requerimiento)
     {
         $excelData = [
-            ["FOLIO GUIA", "DETALLE", "DESPACHADO", "RECIBIDO", "TIPO OBS.", "MOTIVO"]
+            ["FOLIO GUIA", "DETALLE", "DESPACHADO", "RECIBIDO", "TIPO OBS.", "MOTIVO", "COMENTARIO"]
         ];
 
         foreach ($requerimiento->guiasDespacho as $guia) {
@@ -43,7 +43,8 @@ class RechazoController extends Controller
                         $producto->pivot->real,
                         $producto->pivot->cantidad_recibido,
                         $observacion->estado,
-                        $observacion->nombre
+                        $observacion->nombre,
+                        $producto->pivot->observacion
                     ];
                 }
             }
