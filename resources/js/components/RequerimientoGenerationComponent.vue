@@ -384,11 +384,12 @@ export default {
           "FAMILIA",
           "DETALLE",
           "MARCA",
+          "FORMATO",
           "P. UNIT",
           "CANTIDAD",
           "SUBTOTAL",
           "TOTAL=",
-          { f: "=SUMA(G:G)" }
+          { f: "=SUMA(H:H)" }
         ]
       ];
       productos.forEach((product, index) => {
@@ -397,9 +398,10 @@ export default {
           product.familia,
           product.detalle,
           product.marca,
+          product.formato,
           product.venta,
           0,
-          { f: `=(E${index + 2}*F${index + 2})` }
+          { f: `=(F${index + 2}*G${index + 2})` }
         ]);
       });
 
