@@ -25,20 +25,22 @@
                 <form action="{{ route("estado_pago_generar_resumen") }}" method="POST" accept-charset="utf-8">
                     @csrf
 
-                    <div class="form-group row">
-                        <label class="col-sm-2" for="inicio">Fecha de Inicio:</label>
-                        <span class="col-sm-6">
-                            <input class="form-control" required type="date" name="inicio">
-                            <p class="text-muted">Obligatorio</p>
-                        </span>
-                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-2 d-flex flex-col">
+                            <label class="" for="inicio">Fecha de Inicio:</label>
+                            <span class="">
+                                <input class="form-control" required type="date" name="inicio">
+                                <p class="text-muted">Obligatorio</p>
+                            </span>
+                        </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2" for="fin">Fecha de Fin:</label>
-                        <span class="col-sm-6">
-                            <input class="form-control" required type="date" name="fin">
-                            <p class="text-muted">Obligatorio</p>
-                        </span>
+                        <div class="form-group col-md-2 d-flex flex-col">
+                            <label class="" for="fin">Fecha de Fin:</label>
+                            <span class="">
+                                <input class="form-control" required type="date" name="fin">
+                                <p class="text-muted">Obligatorio</p>
+                            </span>
+                        </div>
                     </div>
 
                     <v-expansion-panels>
@@ -121,7 +123,7 @@
                             <td>{{ number_format($guia->sinNotaCredito)  }}</td>
                             <td>{{ number_format($guia->liquidacion)  }}</td>
                             <td>
-                                    <button class="btn btn-info">Nota Credito</button>
+                                <button class="btn btn-info">Nota Credito</button>
                             </td>
                         </tr>
                         @endforeach

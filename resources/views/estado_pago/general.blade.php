@@ -32,7 +32,7 @@
                         </select>
                     </div>
                     @endisset
-                    <div class="flex flex-col">
+                    <div class="flex flex-col mx-2">
                         <label for="">Desde:</label>
                         <input type="date" name="inicio" class="form-control" />
                     </div>
@@ -41,7 +41,7 @@
                         <label for="">Hasta:</label>
                         <input type="date" name="fin" class="form-control" />
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col mx-2">
                         <button type="submit" class="btn btn-primary">Ver Guias</button>
                     </div>
 
