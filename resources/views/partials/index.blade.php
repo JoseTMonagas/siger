@@ -8,8 +8,8 @@
             @if ((Auth::user()->userable instanceof \App\Centro))
             <th scope="col">Libreria</th>
             @endif
-            <th scope="col">Fecha de Creacion</th>
-            <th scope="col">Ultima Actualizacion</th>
+            <th scope="col">Creado</th>
+            <th scope="col">Actualizado</th>
             <th scope="col">Accion</th>
         </tr>
     </thead>
@@ -22,7 +22,7 @@
                 </a>
             </td>
             <td>
-                {{ $requerimiento->folio ?? "N/A"  }}
+                {{ $requerimiento->folio ? $requerimiento->folio->join(", ") : "N/A"  }}
             </td>
             <td>{{ $requerimiento->estado }}</td>
             @if ((Auth::user()->userable instanceof \App\Centro))
@@ -33,8 +33,8 @@
                                         ->hasRequerimiento($requerimiento))'></agregar-libreria-component>
             </td>
             @endif
-            <td>{{ $requerimiento->created_at }}</td>
-            <td>{{ $requerimiento->updated_at }}</td>
+            <td>{{ date_format($requerimiento->created_at, "d-m-Y") }}</td>
+            <td>{{ date_format($requerimiento->updated_at, "d-m-Y") }}</td>
             <td>
                 <div class="btn-group" role="group">
                     @if (Auth::user()->userable instanceof \App\Centro)
@@ -75,74 +75,74 @@
 @elseif ($type === 1)
 <div class="table-responsive">
     <table id="datatable" class="table table-sm">
-    <thead>
-        <tr>
-            <th scope="col" rowspan="2">Nombre</th>
-            <th scope="col" rowspan="2">Accion</th>
-            <th class="text-center" scope="row" colspan="{{ \App\Estado::all()->count() }}">Estados</th>
-        </tr>
-        <tr>
-            @foreach(\App\Estado::all() as $estado)
+        <thead>
+            <tr>
+                <th scope="col" rowspan="2">Nombre</th>
+                <th scope="col" rowspan="2">Accion</th>
+                <th class="text-center" scope="row" colspan="{{ \App\Estado::all()->count() }}">Estados</th>
+            </tr>
+            <tr>
+                @foreach(\App\Estado::all() as $estado)
                 <th scope="col">{{ $estado->nombre }}</th>
-            @endforeach
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($centros as $centro)
-        <tr>
-            <td>{{ $centro->nombre }}</td>
-            <td>
-                <a href="{{ route('pedidos.centroIndex', ['centro' => $centro->id, 'estado' => '0']) }}">
-                    Ver Detalles
-                </a>
-            </td>
-            @foreach(\App\Estado::all() as $estado)
-            <td>
-                {{ count($centro->requerimientos()->where('estado', $estado->nombre)->get()) }}
+                @endforeach
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($centros as $centro)
+            <tr>
+                <td>{{ $centro->nombre }}</td>
+                <td>
+                    <a href="{{ route('pedidos.centroIndex', ['centro' => $centro->id, 'estado' => '0']) }}">
+                        Ver Detalles
+                    </a>
+                </td>
+                @foreach(\App\Estado::all() as $estado)
+                <td>
+                    {{ count($centro->requerimientos()->where('estado', $estado->nombre)->get()) }}
 
-            </td>
+                </td>
+                @endforeach
+
+            </tr>
             @endforeach
-            
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+        </tbody>
+    </table>
 </div>
 @elseif ($type === 2)
 <div class="table-responsive">
     <table id="datatable" class="table table-sm">
-    <thead>
-        <tr>
-            <th scope="col" rowspan="2">Nombre</th>
-            <th scope="col" rowspan="2">Accion</th>
-            <th class="text-center" scope="row" colspan="{{ \App\Estado::all()->count() }}">Estados</th>
-        </tr>
-        <tr>
-            @foreach(\App\Estado::all() as $estado)
+        <thead>
+            <tr>
+                <th scope="col" rowspan="2">Nombre</th>
+                <th scope="col" rowspan="2">Accion</th>
+                <th class="text-center" scope="row" colspan="{{ \App\Estado::all()->count() }}">Estados</th>
+            </tr>
+            <tr>
+                @foreach(\App\Estado::all() as $estado)
                 <th scope="col">{{ $estado->nombre }}</th>
+                @endforeach
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($empresas as $empresa)
+            <tr>
+                <td>{{ $empresa->razon_social }}</td>
+                <td>
+                    <a href="{{ route('pedidos.indexCentro', ['empresa' => $empresa, 'estado' => 0])}}">
+                        Ver Todos
+                    </a>
+                </td>
+                @foreach(\App\Estado::all() as $estado)
+                <td>
+                    <a href="{{ route('pedidos.indexCentro', ['empresa' => $empresa, 'estado' => $estado->id])}}">
+                        {{ count($empresa->getRequerimientoByEstado($estado->nombre)) }}
+                    </a>
+                </td>
+                @endforeach
+
+            </tr>
             @endforeach
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($empresas as $empresa)
-        <tr>
-            <td>{{ $empresa->razon_social }}</td>
-            <td>
-                <a href="{{ route('pedidos.indexCentro', ['empresa' => $empresa, 'estado' => 0])}}">
-                    Ver Todos
-                </a>
-            </td>
-            @foreach(\App\Estado::all() as $estado)
-            <td>
-                <a href="{{ route('pedidos.indexCentro', ['empresa' => $empresa, 'estado' => $estado->id])}}">
-                    {{ count($empresa->getRequerimientoByEstado($estado->nombre)) }}
-                </a>
-            </td>
-            @endforeach
-            
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+        </tbody>
+    </table>
 </div>
 @endif
