@@ -124,7 +124,6 @@ const app = new Vue({
 $(document).ready(function() {
   $("#datatable").DataTable({
     dom: "Blfrtip",
-    fixedHeader: true,
     buttons: ["copy", "csv", "excel", "pdf"],
     lengthMenu: [
       [10, 25, 50, -1],
