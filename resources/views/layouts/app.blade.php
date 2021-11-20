@@ -32,7 +32,7 @@
                 <a class="navbar-brand" href="@yield('home-route')">
                     <div class="d-flex flex-row align-items-baseline justify-content-center h3">
                         <img src="{{ asset('img/logocompassc1.png')}}" class="w-64 img-fluid" alt="Logo de MLine" />
-                        <span class="h1 text-primary ml-2 mb-1">SIGER</span>
+                        <span class="h1 text-primary font-bold italic ml-2 mb-1 p-2">Viveres</span>
                     </div>
                 </a>
 
