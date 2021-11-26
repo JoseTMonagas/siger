@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 
 class EstadoPagoController extends Controller
 {
@@ -114,6 +115,17 @@ class EstadoPagoController extends Controller
         $guiaDespacho->productos()->updateExistingPivot($producto["id"], $producto["pivot"]);
 
         return response()->json($producto);
+    }
+
+    public function conceptoMassiveStore(GuiaDespacho $guiaDespacho, Request $request)
+    {
+        $productos = $request->input("productos");
+
+        foreach ($productos as $producto) {
+            $guiaDespacho->productos()->updateExistingPivot($producto["id"], $producto["pivot"]);
+        }
+
+        return response()->json($productos);
     }
 
     public function generarReclamo(GuiaDespacho $guiaDespacho, Producto $producto, Request $request)
@@ -226,6 +238,35 @@ class EstadoPagoController extends Controller
     {
         $empresas = Empresa::all();
         return view("estado_pago.cierre", compact("empresas"));
+    }
+
+    public function marcarGuiaLiquidado(GuiaDespacho $guiaDespacho)
+    {
+        $guiaDespacho->liquidado = Carbon::now();
+        $guiaDespacho->save();
+
+        return back();
+    }
+
+    public function notaCredito(GuiaDespacho $guiaDespacho)
+    {
+        $neto = 0;
+        $productos = $guiaDespacho->productos()->wherePivot("genera_nc", true)->get()->map(function (Producto $producto) {
+            $cantidad = 0;
+            if ($producto->pivot->cantidad_recibido > 0) {
+                $cantidad = $producto->pivot->real - $producto->pivot->cantidad_recibido;
+            } else {
+                $cantidad = $producto->pivot->real;
+            }
+            $producto["subtotal"] =  abs($cantidad * $producto->pivot->precio);
+            return $producto;
+        });
+        foreach ($productos as $producto) {
+            $neto += $producto["subtotal"];
+        }
+        $iva = $neto * 0.19;
+        $total = $neto + $iva;
+        return view("estado_pago.nota-credito", compact("guiaDespacho", "productos", "neto", "iva", "total"));
     }
 
     public function generarCierre(Request $request)

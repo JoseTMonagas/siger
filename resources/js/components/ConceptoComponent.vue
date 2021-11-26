@@ -93,9 +93,15 @@
         </tr>
       </tbody>
       <tfoot v-if="!generaReclamos">
-        <button @click="onActualizacionClick()" class="btn btn-outline-info">
-          ENVIAR ACTUALIZACION
-        </button>
+        <div class="flex flex-row justify-around">
+          <button @click="onActualizacionClick()" class="btn btn-outline-info">
+            ENVIAR ACTUALIZACION
+          </button>
+
+          <button @click="onGuardarTodoClick()" class="btn btn-outline-success">
+            GUARDAR TODO
+          </button>
+        </div>
       </tfoot>
     </template>
   </v-simple-table>
@@ -116,6 +122,10 @@ export default {
       required: true
     },
     storeRoute: {
+      type: String,
+      required: false
+    },
+    massiveRoute: {
       type: String,
       required: false
     },
@@ -154,6 +164,34 @@ export default {
     onSaveProduct(producto) {
       axios
         .post(this.getRoute(producto.id), { producto })
+        .catch(function(error) {
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log("Error", error.message);
+          }
+          console.log(error.config);
+        })
+        .then(resp => {
+          if (resp.status == 200) {
+            alert("Guardado exitosamente");
+          }
+        });
+    },
+    onGuardarTodoClick() {
+      const productos = this.productos;
+      axios
+        .post(this.massiveRoute, { productos })
         .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code

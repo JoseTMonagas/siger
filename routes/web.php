@@ -354,11 +354,16 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post("{guiaDespacho}/producto", "EstadoPagoController@conceptoStore")->name("estado_pago_concepto_store");
         Route::post("{guiaDespacho}/producto/{producto?}", "EstadoPagoController@generarReclamo")->name("estado_pago_reclamo");
+        Route::post("{guiaDespacho}/productos", "EstadoPagoController@conceptoMassiveStore")->name("estado_pago_concepto_masivo");
 
         Route::get("resumen", "EstadoPagoController@resumen")->name("estado_pago_resumen");
         Route::post("resumen", "EstadoPagoController@generarResumen")->name("estado_pago_generar_resumen");
 
+        Route::post("{guiaDespacho}/liquidado", "EstadoPagoController@marcarGuiaLiquidado")->name("estado_pago_liquidado");
+
         Route::get("cierre", "EstadoPagoController@cierre")->name("estado_pago_cierre");
         Route::post("cierre", "EstadoPagoController@generarCierre")->name("estado_pago_generar_cierre");
+
+        Route::get("nota-credito/{guiaDespacho}", "EstadoPagoController@notaCredito")->name("estado_pago_nota_credito");
     });
 });

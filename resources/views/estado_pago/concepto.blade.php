@@ -39,6 +39,7 @@
                 <concepto-component :guia-despacho='@json($guiaDespacho)' :productos='@json($productos)' :observaciones='@json($observaciones)' @if ((Auth::user()->userable instanceof \App\CompassRole))
                     actualizacion-route="{{ $actualizacionRoute  }}"
                     store-route="{{ $storeRoute }}"
+                    massive-route="{{ route("estado_pago_concepto_masivo", $guiaDespacho) }}"
                     @else
                     :genera-reclamos="true"
                     reclamo-route="{{ route("estado_pago_reclamo", [$guiaDespacho]) }}"

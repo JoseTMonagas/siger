@@ -123,7 +123,15 @@
                             <td>{{ number_format($guia->sinNotaCredito)  }}</td>
                             <td>{{ number_format($guia->liquidacion)  }}</td>
                             <td>
-                                <button class="btn btn-info">Nota Credito</button>
+                                @isset($guia->liquidado)
+                                <button disabled class="btn btn-info">YA LIQUIDADO</button>
+                                @else
+                                <form method="POST" action="{{ route("estado_pago_liquidado", $guia) }}">
+                                    @csrf
+
+                                    <button type="submit" class="btn btn-warning">MARCAR COMO LIQUIDADO</button>
+                                </form>
+                                @endisset
                             </td>
                         </tr>
                         @endforeach
