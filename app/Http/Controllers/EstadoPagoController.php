@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Centro;
 use App\Empresa;
+use App\Exports\CierreEstadoPago;
 use App\GuiaDespacho;
 use App\Mail\Reclamo;
 use App\Mail\EstadoPagoActualizado;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EstadoPagoController extends Controller
 {
@@ -218,5 +220,105 @@ class EstadoPagoController extends Controller
 
 
         return view("estado_pago.resumen", compact("empresas", "centros", "zonas", "guiasDespacho"));
+    }
+
+    public function cierre(Request $request)
+    {
+        $empresas = Empresa::all();
+        return view("estado_pago.cierre", compact("empresas"));
+    }
+
+    public function generarCierre(Request $request)
+    {
+        $mes = $request->input("mes");
+        $inicio = Carbon::create(null, $mes, 1, 0, 0, 0)->startOfMonth();
+        $fin = Carbon::create(null, $mes, 1, 0, 0, 0)->endOfMonth();
+        $empresa = Empresa::findOrFail($request->input("empresa"));
+
+        $requerimientos = $empresa->requerimientos()
+            ->whereIn("estado", ["RECIBIDO", "RECIBIDO CON OBSERVACIONES"])
+            ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                $query->whereDate("fecha", ">=", $inicio)
+                    ->whereDate("fecha", "<=", $fin)
+                    ->whereNotNull("febos_id");
+            })
+            ->orderBy("centro_id")
+            ->orderBy("created_at")
+            ->get()
+            ->load("guiasDespacho");
+
+        $estadoPago = [
+            ["ESTADO DE PAGO"],
+            [""],
+            ["PERIODO", $fin->format("M - Y")],
+            ["CONTRATO", $empresa->razon_social],
+            ["SECTOR", "PUERTO MONTT"],
+            ["SERVICIOS", "VIVERES"],
+            ["RESPONSABLE", ""],
+            [""],
+            ["RESUMEN SERVICIOS MENSUAL"],
+            ["SERVICIOS", "UNIT", "NETO", "TOTAL", "RESPALDOS"]
+        ];
+
+        $detViveres = [
+            ["PACK ABASTECIMIENTO CENTROS {$fin->format('M Y')}"],
+            [''],
+            [
+                'FECHA',
+                'BODEGA ORIGEN',
+                'TRATAMIENTO',
+                'CENTRO',
+                'GUIA',
+                'PRODUCTO',
+                'CANTIDAD',
+                'UNIT',
+                'TOTAL',
+                'OBSERVACIONES'
+            ]
+        ];
+
+        $detGuia = [
+            ["CENTRO", "FECHA", "GUIA", "TOTAL"]
+        ];
+
+
+        if ($requerimientos->count() > 0) {
+            $total = 0;
+            foreach ($requerimientos as $requerimiento) {
+                if ($requerimiento->guiasDespacho->count() > 0) {
+                    $guias = $requerimiento->guiasDespacho()->orderBy("created_at", "asc")->get();
+                    $totalGuias = 0;
+                    foreach ($guias as $guiaDespacho) {
+                        if ($guiaDespacho->productos->count() > 0) {
+                            foreach ($guiaDespacho->productos as $producto) {
+                                $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+                                $subtotal = $producto->pivot->precio * $cantidad;
+                                $total += $subtotal;
+                                $totalGuias += $subtotal;
+                                $detViveres[] = [
+                                    date("d/m/Y", strtotime($guiaDespacho->created_at)),
+                                    'PTO MONTT',
+                                    'VTA',
+                                    $requerimiento->centro->nombre,
+                                    $guiaDespacho->folio,
+                                    $producto->detalle,
+                                    $cantidad,
+                                    $producto->pivot->precio,
+                                    $subtotal,
+                                    $producto->pivot->observaciones
+                                ];
+                            }
+
+                            $detGuia[] = [$requerimiento->centro->nombre, $guiaDespacho->fecha, $guiaDespacho->folio, $guiaDespacho->liquidacion];
+                        }
+                    }
+                    $detGuia[] = ["", "Total {$guiaDespacho->fecha}", "", $totalGuias];
+                }
+            }
+            $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", 1, $total, $total, ""];
+        }
+
+        $export = new CierreEstadoPago($estadoPago, $detViveres, $detGuia);
+        return Excel::download($export, "cierre-{$empresa->razon_social}.xlsx");
     }
 }

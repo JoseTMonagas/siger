@@ -357,5 +357,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get("resumen", "EstadoPagoController@resumen")->name("estado_pago_resumen");
         Route::post("resumen", "EstadoPagoController@generarResumen")->name("estado_pago_generar_resumen");
+
+        Route::get("cierre", "EstadoPagoController@cierre")->name("estado_pago_cierre");
+        Route::post("cierre", "EstadoPagoController@generarCierre")->name("estado_pago_generar_cierre");
     });
 });

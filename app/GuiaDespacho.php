@@ -27,7 +27,7 @@ class GuiaDespacho extends Model
 
     public function productos()
     {
-        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc");
+        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc", "liquidado");
     }
 
     public function rechazos()
@@ -124,6 +124,17 @@ class GuiaDespacho extends Model
     public function getLiquidacionAttribute()
     {
         return $this->neto - $this->notaCredito;
+    }
+
+    public function getNoLiquidadosRechazados()
+    {
+        return $this->productos()->wherePivotIn("tipo_observacion_id", [2, 3])->wherePivotNull("liquidado")->count();
+    }
+
+
+    public function getNoLiquidadosObservados()
+    {
+        return $this->productos()->wherePivotIn("tipo_observacion_id", [4, 5, 6, 7])->wherePivotNull("liquidado")->count();
     }
 
     public function getMontoRechazosAttribute()

@@ -16,15 +16,14 @@
       </thead>
       <tbody>
         <tr
-          v-for="(producto,
-                      indexProductos) in productos"
+          v-for="(producto, indexProductos) in productos"
           :key="indexProductos"
         >
           <td>{{ producto.sku }}</td>
           <td>{{ producto.detalle }}</td>
           <td>{{ producto.pivot.real }}</td>
           <td>{{ producto.pivot.cantidad_recibido }}</td>
-          <td>
+          <td class="w-48">
             <select
               :disabled="generaReclamos"
               class="form-control"
@@ -34,7 +33,8 @@
                 v-for="observacion in observaciones"
                 :value="observacion.id"
                 :key="`${indexProductos}-${observacion.id}`"
-              >{{ observacion.nombre }}</option>
+                >{{ observacion.nombre }}</option
+              >
             </select>
             <small>{{ getObservacionLabel(producto) }}</small>
           </td>
@@ -63,7 +63,12 @@
             </article>
           </td>
           <td v-if="generaReclamos">
-            <button class="btn btn-warning" @click="onGenerarReclamoClick(producto)">GENERAR RECLAMO</button>
+            <button
+              class="btn btn-warning"
+              @click="onGenerarReclamoClick(producto)"
+            >
+              GENERAR RECLAMO
+            </button>
           </td>
           <td>
             <textarea
@@ -75,14 +80,22 @@
           <td>
             <button
               :disabled="generaReclamos"
-              class="btn btn-primary"
+              :class="[
+                'btn',
+                producto.pivot.liquidado != null ? 'btn-warning' : 'btn-success'
+              ]"
               @click="onSaveProduct(producto)"
-            >ACEPTAR</button>
+            >
+              <span v-if="producto.pivot.liquidado != null">ACTUALIZAR</span>
+              <span v-else>GUARDAR</span>
+            </button>
           </td>
         </tr>
       </tbody>
       <tfoot v-if="!generaReclamos">
-        <button @click="onActualizacionClick()" class="btn btn-primary">ENVIAR ACTUALIZACION</button>
+        <button @click="onActualizacionClick()" class="btn btn-outline-info">
+          ENVIAR ACTUALIZACION
+        </button>
       </tfoot>
     </template>
   </v-simple-table>
@@ -92,38 +105,38 @@ export default {
   props: {
     guiaDespacho: {
       type: Object,
-      required: true,
+      required: true
     },
     observaciones: {
       type: Array,
-      required: true,
+      required: true
     },
     productos: {
       type: Array,
-      required: true,
+      required: true
     },
     storeRoute: {
       type: String,
-      required: false,
+      required: false
     },
     generaReclamos: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     reclamoRoute: {
       type: String,
-      required: false,
+      required: false
     },
     actualizacionRoute: {
       type: String,
-      required: false,
-    },
+      required: false
+    }
   },
   methods: {
     getObservacionLabel(producto) {
       const observacion = this.observaciones.find(
-        (observacion) => observacion.id == producto.pivot.tipo_observacion_id
+        observacion => observacion.id == producto.pivot.tipo_observacion_id
       );
 
       if (observacion !== undefined) {
@@ -141,7 +154,7 @@ export default {
     onSaveProduct(producto) {
       axios
         .post(this.getRoute(producto.id), { producto })
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -159,7 +172,7 @@ export default {
           }
           console.log(error.config);
         })
-        .then((resp) => {
+        .then(resp => {
           if (resp.status == 200) {
             alert("Guardado exitosamente");
           }
@@ -169,7 +182,7 @@ export default {
       const sku = producto.sku;
       const detalle = producto.detalle;
       let observacion = this.observaciones.find(
-        (observacion) => observacion.id == producto.pivot.tipo_observacion_id
+        observacion => observacion.id == producto.pivot.tipo_observacion_id
       );
 
       if (observacion !== undefined) {
@@ -183,13 +196,13 @@ export default {
         html: `<b>${sku} ${detalle}</b>, ${observacion}, <br /> el cual genera nota de credito: ${notaCredito}. <br /> Puede incluir un mensaje adicional:`,
         input: "text",
         showCancelButton: true,
-        cancelButtonText: "Cancelar",
-      }).then((result) => {
+        cancelButtonText: "Cancelar"
+      }).then(result => {
         if (result.isConfirmed) {
           const message = result.value;
           axios
             .post(this.getRoute(producto.id), { message })
-            .catch(function (error) {
+            .catch(function(error) {
               if (error.response) {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
@@ -207,7 +220,7 @@ export default {
               }
               console.log(error.config);
             })
-            .then((resp) => {
+            .then(resp => {
               if (resp.status == 200) {
                 alert("Se envio el reclamo exitosamente");
               }
@@ -218,7 +231,7 @@ export default {
     onActualizacionClick() {
       axios
         .post(this.actualizacionRoute)
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -236,12 +249,12 @@ export default {
           }
           console.log(error.config);
         })
-        .then((resp) => {
+        .then(resp => {
           if (resp.status == 200) {
             alert("Correo enviado");
           }
         });
-    },
-  },
+    }
+  }
 };
 </script>

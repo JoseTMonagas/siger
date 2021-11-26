@@ -100,6 +100,7 @@
         <a class="dropdown-item" href="{{route('reportes.carta.view')}}">Carta de Trabajo</a>
         <a class="dropdown-item" href="{{route('estado_pago_general')}}">Estados de Pago</a>
         <a class="dropdown-item" href="{{route('estado_pago_resumen')}}">Resumen Estado de Pago</a>
+        <a class="dropdown-item" href="{{route('estado_pago_cierre')}}">Cierre Estado de Pago</a>
     </div>
 </li>
 <li class="nav-item">
