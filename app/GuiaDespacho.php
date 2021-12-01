@@ -27,7 +27,7 @@ class GuiaDespacho extends Model
 
     public function productos()
     {
-        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc", "liquidado");
+        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc", "liquidado", "contenedor");
     }
 
     public function rechazos()
@@ -57,39 +57,50 @@ class GuiaDespacho extends Model
 
     public function hasAceptadas(): bool
     {
-        $productos = $this->productos()->wherePivot("tipo_observacion_id", 1)->get();
+        $productos = $this->productos()->wherePivot("tipo_observacion_id", 1)->wherePivot("contenedor", false)->get();
 
         return $productos->count() > 0;
     }
 
     public function hasRechazadas(): bool
     {
-        $productos = $this->productos()->wherePivotIn("tipo_observacion_id", [2, 3])->get();
+        $productos = $this->productos()->wherePivotIn("tipo_observacion_id", [2, 3])->wherePivot("contenedor", false)->get();
 
         return $productos->count() > 0;
     }
 
     public function hasObservadas(): bool
     {
-        $productos = $this->productos()->wherePivotIn("tipo_observacion_id", [4, 5, 6, 7])->get();
+        $productos = $this->productos()->wherePivotIn("tipo_observacion_id", [4, 5, 6, 7])->wherePivot("contenedor", false)->get();
 
         return $productos->count() > 0;
     }
 
+    public function hasContenedor(): bool
+    {
+        return $this->getContenedorCount() > 0;
+    }
+
     public function getObservacionesCountById(int $id): int
     {
-        $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->get();
+        $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->wherePivot("contenedor", false)->get();
 
         return $productos->count();
     }
 
     public function getProductosByObservacionesId(int $id)
     {
-        $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->get();
+        $productos = $this->productos()->wherePivot("tipo_observacion_id", $id)->wherePivot("contenedor", false)->get();
 
         return $productos;
     }
 
+    public function getContenedorCount(): int
+    {
+        $productos = $this->productos()->wherePivot("contenedor", true)->get();
+
+        return $productos->count();
+    }
 
     public function getNetoAttribute()
     {
@@ -111,7 +122,7 @@ class GuiaDespacho extends Model
     public function getNotaCreditoAttribute()
     {
         return $this->productos->filter(function ($producto) {
-            return $producto->pivot->genera_nc;
+            return $producto->pivot->genera_nc && !$producto->pivot->contenedor;
         })->reduce(function ($carry, $producto) {
             $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
             if ($producto->pivot->tipo_observacion_id == 2) {
@@ -121,9 +132,22 @@ class GuiaDespacho extends Model
         });
     }
 
+    public function getNotaCreditoContenedorAttribute()
+    {
+        return $this->productos->filter(function ($producto) {
+            return $producto->pivot->genera_nc && $producto->pivot->contenedor;
+        })->reduce(function ($carry, $producto) {
+            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            if ($producto->pivot->tipo_observacion_id == 2) {
+                $cantidad = 0;
+            }
+            return $carry + (1 * $cantidad);
+        });
+    }
+
     public function getLiquidacionAttribute()
     {
-        return $this->neto - $this->notaCredito;
+        return $this->neto - $this->notaCredito - $this->notaCreditoContenedor;
     }
 
     public function getNoLiquidadosRechazados()
@@ -227,14 +251,28 @@ class GuiaDespacho extends Model
 
     public function agregarProductos($productos)
     {
+        $CONTENEDORES = collect(["20500010010", "20500010013", "20500010011", "20500010014"]);
         foreach ($productos as $producto) {
-            $attach = [$producto->id => [
-                "cantidad" => floatval($producto->pivot->cantidad),
-                "precio" => $producto->pivot->precio,
-                "real" => floatval($producto->pivot->real),
-                "observacion" => $producto->pivot->observacion,
-                "fecha_vencimiento" => $producto->pivot->fecha_vencimiento,
-            ]];
+            $attach = null;
+            if ($CONTENEDORES->contains($producto->sku)) {
+                $attach = [$producto->id => [
+                    "cantidad" => floatval($producto->pivot->cantidad),
+                    "precio" => $producto->pivot->precio,
+                    "real" => floatval($producto->pivot->real),
+                    "observacion" => $producto->pivot->observacion,
+                    "fecha_vencimiento" => $producto->pivot->fecha_vencimiento,
+                    "genera_nc" => true,
+                    "contenedor" => true,
+                ]];
+            } else {
+                $attach = [$producto->id => [
+                    "cantidad" => floatval($producto->pivot->cantidad),
+                    "precio" => $producto->pivot->precio,
+                    "real" => floatval($producto->pivot->real),
+                    "observacion" => $producto->pivot->observacion,
+                    "fecha_vencimiento" => $producto->pivot->fecha_vencimiento,
+                ]];
+            }
             $this->productos()->attach($attach);
         }
     }

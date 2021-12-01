@@ -23,7 +23,7 @@ class Producto extends Model
 
     public function guiasDespacho()
     {
-        return $this->belongsToMany('App\GuiaDespacho')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento');
+        return $this->belongsToMany('App\GuiaDespacho')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc", "liquidado", "contenedor");
     }
 
     public function rechazos()
