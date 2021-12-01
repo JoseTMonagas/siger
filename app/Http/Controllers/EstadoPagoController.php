@@ -40,7 +40,7 @@ class EstadoPagoController extends Controller
         $fin = $request->input("fin");
 
         $guias = GuiaDespacho::whereHas("productos", function (Builder $query) {
-            $query->whereIn("tipo_observacion_id", [2, 3, 4, 5, 6, 7, 8]);
+            $query->whereIn("tipo_observacion_id", [1, 2, 3, 4, 5, 6, 7, 8]);
         });
 
         if (isset($inicio)) {
@@ -328,7 +328,7 @@ class EstadoPagoController extends Controller
             ["RESPONSABLE", ""],
             [""],
             ["RESUMEN SERVICIOS MENSUAL"],
-            ["SERVICIOS", "UNIT", "NETO", "TOTAL", "RESPALDOS"]
+            ["SERVICIOS", "TOTAL"]
         ];
 
         $detViveres = [
@@ -386,7 +386,7 @@ class EstadoPagoController extends Controller
                     $detGuia[] = ["", "Total {$guiaDespacho->fecha}", "", $totalGuias];
                 }
             }
-            $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", 1, $total, $total, ""];
+            $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", $total];
         }
 
         $export = new CierreEstadoPago($estadoPago, $detViveres, $detGuia);
