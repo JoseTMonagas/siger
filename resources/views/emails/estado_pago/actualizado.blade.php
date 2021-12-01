@@ -10,6 +10,10 @@ Los productos con este concepto ahora son: <br />
 |{{$producto->sku}}|{{$producto->detalle}}|{{$producto->pivot->real}}|{{$producto->pivot->cantidad_recibido}}|{{$producto->pivot->genera_nc ? "SI" : "NO"}}|
 @endforeach
 
+@component('mail::button', ['url' => route("estado_pago_concepto", [$guiaDespacho, $tipoObservacion])])
+Puede ver el detalle aqui.
+@endcomponent
+
 Gracias,<br>
 {{ config('app.name') }}
 @endcomponent
