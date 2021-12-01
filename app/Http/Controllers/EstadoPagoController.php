@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Centro;
 use App\Empresa;
+use App\Exports\ArrayExport;
 use App\Exports\CierreEstadoPago;
 use App\GuiaDespacho;
 use App\Mail\Reclamo;
@@ -17,7 +18,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use PDF;
 
 class EstadoPagoController extends Controller
 {
@@ -112,6 +112,7 @@ class EstadoPagoController extends Controller
     public function conceptoStore(GuiaDespacho $guiaDespacho, Request $request)
     {
         $producto = $request->input("producto");
+        $producto["pivot"]["liquidado"] = true;
         $guiaDespacho->productos()->updateExistingPivot($producto["id"], $producto["pivot"]);
 
         return response()->json($producto);
@@ -122,6 +123,7 @@ class EstadoPagoController extends Controller
         $productos = $request->input("productos");
 
         foreach ($productos as $producto) {
+            $producto["pivot"]["liquidado"] = true;
             $guiaDespacho->productos()->updateExistingPivot($producto["id"], $producto["pivot"]);
         }
 
@@ -139,7 +141,8 @@ class EstadoPagoController extends Controller
 
     public function enviarActualizacion(GuiaDespacho $guiaDespacho, TipoObservacion $tipoObservacion)
     {
-        $users = $guiaDespacho->requerimiento->getUserByRequerimiento();
+        $empresa = $guiaDespacho->requerimiento->centro->empresa;
+        $users = User::where("userable_type", "App\Empresa")->where("userable_id", $empresa->id)->where('logistica', 1)->get();
         $emails = [];
         foreach ($users as $user) {
             $emails[] = $user->email;
@@ -217,6 +220,29 @@ class EstadoPagoController extends Controller
 
         $guiasDespacho = GuiaDespacho::whereIn("requerimiento_id", $requerimientos->pluck("id"))->distinct()->get();
 
+        if ($request->has("excel") && boolval($request->input("excel"))) {
+            $excelData[] = [
+                ["CENTRO", "ID REQ.", "FOLIO", "FECHA", "MONTO", "NOTA CREDITO", "NC CONTENEDORES", "SIN NOTA CREDITO", "LIQUIDACION"],
+            ];
+
+            foreach ($guiasDespacho as $guia) {
+                $excelData[] = [
+                    $guia->nombre_centro,
+                    $guia->requerimiento_id,
+                    $guia->folio,
+                    $guia->fecha,
+                    number_format($guia->neto),
+                    number_format($guia->notaCredito),
+                    number_format($guia->notaCreditoContenedor),
+                    number_format($guia->sinNotaCredito),
+                    number_format($guia->liquidacion),
+                ];
+            }
+
+            $export = new ArrayExport($excelData);
+            return Excel::download($export, "Resumen estado de pago.xlsx");
+        }
+
         $user = Auth::user();
         $empresas = null;
         $centros = null;
@@ -242,7 +268,11 @@ class EstadoPagoController extends Controller
 
     public function marcarGuiaLiquidado(GuiaDespacho $guiaDespacho)
     {
-        $guiaDespacho->liquidado = Carbon::now();
+        if (isset($guiaDespacho->liquidado)) {
+            $guiaDespacho->liquidado = null;
+        } else {
+            $guiaDespacho->liquidado = Carbon::now();
+        }
         $guiaDespacho->save();
 
         return back();

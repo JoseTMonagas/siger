@@ -25,7 +25,8 @@
                     @isset($empresas)
                     <div class="flex flex-col">
                         <label for="">Empresa:</label>
-                        <select class="form-control" name="empresa_id">
+                        <select class="form-control" name="empresa_id" required>
+                            <option>Seleccione una empresa</option>
                             @foreach($empresas as $empresa)
                             <option value="{{ $empresa->id }}">{{ $empresa->razon_social  }}</option>
                             @endforeach
@@ -34,12 +35,12 @@
                     @endisset
                     <div class="flex flex-col mx-2">
                         <label for="">Desde:</label>
-                        <input type="date" name="inicio" class="form-control" />
+                        <input type="date" name="inicio" class="form-control" required />
                     </div>
 
                     <div class="flex flex-col">
                         <label for="">Hasta:</label>
-                        <input type="date" name="fin" class="form-control" />
+                        <input type="date" name="fin" class="form-control" required />
                     </div>
                     <div class="flex flex-col mx-2">
                         <button type="submit" class="btn btn-primary">Ver Guias</button>

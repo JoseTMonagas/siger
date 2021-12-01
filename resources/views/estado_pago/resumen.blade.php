@@ -88,7 +88,8 @@
                         @endisset($zonas)
                     </v-expansion-panels>
 
-                    <button class="btn btn-primary my-5">Ver Estado de Pago</button>
+                    <button type="submit" class="btn btn-primary my-5">Ver Estado de Pago</button>
+                    <button type="submit" class="btn btn-info ml-5" name="excel" value="1">Generar Excel</button>
                 </form>
 
                 @isset($guiasDespacho)
@@ -102,6 +103,7 @@
                             <th>FECHA</th>
                             <th>MONTO</th>
                             <th>NOTA CREDITO</th>
+                            <th>NC CONTENEDORES</th>
                             <th>SIN NOTA CREDITO</th>
                             <th>LIQUIDACION</th>
                             <th>ACCIONES</th>
@@ -120,18 +122,19 @@
                             <td>{{ $guia->fecha  }}</td>
                             <td>{{ number_format($guia->neto)  }}</td>
                             <td>{{ number_format($guia->notaCredito)  }}</td>
+                            <td>{{ number_format($guia->notaCreditoContenedor)  }}</td>
                             <td>{{ number_format($guia->sinNotaCredito)  }}</td>
                             <td>{{ number_format($guia->liquidacion)  }}</td>
                             <td>
-                                @isset($guia->liquidado)
-                                <button disabled class="btn btn-info">YA LIQUIDADO</button>
-                                @else
                                 <form method="POST" action="{{ route("estado_pago_liquidado", $guia) }}">
                                     @csrf
 
-                                    <button type="submit" class="btn btn-warning">MARCAR COMO LIQUIDADO</button>
+                                    @isset($guia->liquidado)
+                                    <button class="btn btn-info">LIQUIDADO</button>
+                                    @else
+                                    @endisset
+                                    <button type="submit" class="btn btn-warning">NO LIQUIDADO</button>
                                 </form>
-                                @endisset
                             </td>
                         </tr>
                         @endforeach
