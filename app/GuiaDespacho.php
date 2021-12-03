@@ -251,7 +251,25 @@ class GuiaDespacho extends Model
 
     public function agregarProductos($productos)
     {
-        $CONTENEDORES = collect(["20500010010", "20500010013", "20500010011", "20500010014"]);
+        $CONTENEDORES = collect([
+            "10500010010",
+            "10500010011",
+            "10500010013",
+            "10500010014",
+            "10500010020",
+            "20500010010",
+            "20500010013",
+            "20500010011",
+            "20500010014",
+            "20500010020",
+            "40500010012",
+            "40500010020",
+            "40500010010",
+            "40500010011",
+            "40500010013",
+            "40500010014",
+            "40500010021",
+        ]);
         foreach ($productos as $producto) {
             $attach = null;
             if ($CONTENEDORES->contains($producto->sku)) {
