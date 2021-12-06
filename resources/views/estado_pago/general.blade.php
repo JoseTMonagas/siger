@@ -22,7 +22,7 @@
             <div class="container mt-2">
                 <form class="flex flex-row items-end" method="POST" action="{{ route("generate_estado_general")  }}">
                     @csrf
-                    @isset($empresas)
+                    @if(isset($empresas) && count($empresas) > 0)
                     <div class="flex flex-col">
                         <label for="">Empresa:</label>
                         <select class="form-control" name="empresa_id" required>
@@ -32,7 +32,7 @@
                             @endforeach
                         </select>
                     </div>
-                    @endisset
+                    @endif
                     <div class="flex flex-col mx-2">
                         <label for="">Desde:</label>
                         <input type="date" name="inicio" class="form-control" required />
