@@ -176,12 +176,11 @@ class EstadoPagoController extends Controller
         $fin = $request->input("fin");
 
         $requerimientos = collect();
+        $isLogistica = Auth::user()->userable instanceof \App\Empresa;
 
-        if (isset($request->empresas)) {
-            $empresas = explode(",", $request->empresas);
-            foreach ($empresas as $empresa) {
-                $empresa = \App\Empresa::find($empresa);
-                $reqEmpresas = $empresa->requerimientos()
+        if (isset($request->empresas) || ($isLogistica && !isset($request->centros))) {
+            if ($isLogistica) {
+                $reqEmpresas = Auth::user()->userable->requerimientos()
                     ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
                         $query->whereDate("fecha", ">=", $inicio)
                             ->whereDate("fecha", "<=", $fin)
@@ -191,8 +190,24 @@ class EstadoPagoController extends Controller
                     ->get();
                 $reqEmpresas->load("guiasDespacho");
                 $requerimientos->push($reqEmpresas);
+                $requerimientos = $requerimientos->flatten();
+            } else {
+                $empresas = explode(",", $request->empresas);
+                foreach ($empresas as $empresa) {
+                    $empresa = \App\Empresa::find($empresa);
+                    $reqEmpresas = $empresa->requerimientos()
+                        ->whereHas("guiasDespacho", function ($query) use ($inicio, $fin) {
+                            $query->whereDate("fecha", ">=", $inicio)
+                                ->whereDate("fecha", "<=", $fin)
+                                ->whereNotNull("febos_id");
+                        })
+                        ->orderBy("created_at")
+                        ->get();
+                    $reqEmpresas->load("guiasDespacho");
+                    $requerimientos->push($reqEmpresas);
+                }
+                $requerimientos = $requerimientos->flatten();
             }
-            $requerimientos = $requerimientos->flatten();
         } elseif (isset($request->centros)) {
             $centros = explode(",", $request->centros);
             $requerimientos = \App\Requerimiento::whereIn("centro_id", $centros)
@@ -257,7 +272,7 @@ class EstadoPagoController extends Controller
         }
 
 
-        return view("estado_pago.resumen", compact("empresas", "centros", "zonas", "guiasDespacho"));
+        return view("estado_pago.resumen", compact("empresas", "centros", "zonas", "guiasDespacho", "isLogistica"));
     }
 
     public function cierre(Request $request)

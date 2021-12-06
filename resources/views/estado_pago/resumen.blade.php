@@ -130,10 +130,10 @@
                                     @csrf
 
                                     @isset($guia->liquidado)
-                                    <button class="btn btn-info">LIQUIDADO</button>
+                                    <button @if($isLogistica) disabled @endif class="btn btn-info">LIQUIDADO</button>
                                     @else
                                     @endisset
-                                    <button type="submit" class="btn btn-warning">NO LIQUIDADO</button>
+                                    <button @if($isLogistica) disabled @endif type="submit" class="btn btn-warning">NO LIQUIDADO</button>
                                 </form>
                             </td>
                         </tr>

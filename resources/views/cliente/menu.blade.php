@@ -123,6 +123,7 @@
             Productos despachados
         </a>
         <a class="dropdown-item" href="{{route('estado_pago_general')}}">Estados de Pago</a>
+        <a class="dropdown-item" href="{{route('estado_pago_resumen')}}">Resumen estados de pago</a>
     </div>
 </li>
 @endif
