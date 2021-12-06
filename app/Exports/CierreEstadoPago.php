@@ -12,12 +12,14 @@ class CierreEstadoPago implements WithMultipleSheets
     protected $estadoPago;
     protected $detViveres;
     protected $detGuia;
+    protected $liquidacion;
 
-    public function __construct(array $estadoPago, array $detViveres, array $detGuia)
+    public function __construct(array $estadoPago, array $detViveres, array $detGuia, array $liquidacion)
     {
         $this->estadoPago = $estadoPago;
         $this->detViveres = $detViveres;
         $this->detGuia = $detGuia;
+        $this->liquidacion = $liquidacion;
     }
 
     /**
@@ -30,6 +32,7 @@ class CierreEstadoPago implements WithMultipleSheets
         $sheets[] = new ArrayExport($this->estadoPago);
         $sheets[] = new ArrayExport($this->detViveres);
         $sheets[] = new ArrayExport($this->detGuia);
+        $sheets[] = new ArrayExport($this->liquidacion);
 
         return $sheets;
     }

@@ -352,6 +352,10 @@ class EstadoPagoController extends Controller
             ["CENTRO", "FECHA", "GUIA", "TOTAL"]
         ];
 
+        $liquidacion[] = [
+            ["CENTRO", "ID REQ.", "FOLIO", "FECHA", "MONTO", "NOTA CREDITO", "NC CONTENEDORES", "SIN NOTA CREDITO", "LIQUIDACION"],
+        ];
+
 
         if ($requerimientos->count() > 0) {
             $total = 0;
@@ -361,6 +365,18 @@ class EstadoPagoController extends Controller
                     $totalGuias = 0;
                     foreach ($guias as $guiaDespacho) {
                         if ($guiaDespacho->productos->count() > 0) {
+                            $liquidacion[] = [
+                                $guiaDespacho->nombre_centro,
+                                $guiaDespacho->requerimiento_id,
+                                $guiaDespacho->folio,
+                                $guiaDespacho->fecha,
+                                number_format($guiaDespacho->neto, 0, ".", ""),
+                                number_format($guiaDespacho->notaCredito, 0, ".", ""),
+                                number_format($guiaDespacho->notaCreditoContenedor, 0, ".", ""),
+                                number_format($guiaDespacho->sinNotaCredito, 0, ".", ""),
+                                number_format($guiaDespacho->liquidacion, 0, ".", ""),
+                            ];
+
                             foreach ($guiaDespacho->productos as $producto) {
                                 $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
                                 $subtotal = $producto->pivot->precio * $cantidad;
@@ -389,7 +405,7 @@ class EstadoPagoController extends Controller
             $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", number_format($total, 0, ".", '')];
         }
 
-        $export = new CierreEstadoPago($estadoPago, $detViveres, $detGuia);
+        $export = new CierreEstadoPago($estadoPago, $detViveres, $detGuia, $liquidacion);
         return Excel::download($export, "cierre-{$empresa->razon_social}.xlsx");
     }
 }
