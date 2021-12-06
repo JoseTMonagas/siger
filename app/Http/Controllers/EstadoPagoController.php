@@ -231,11 +231,11 @@ class EstadoPagoController extends Controller
                     $guia->requerimiento_id,
                     $guia->folio,
                     $guia->fecha,
-                    number_format($guia->neto),
-                    number_format($guia->notaCredito),
-                    number_format($guia->notaCreditoContenedor),
-                    number_format($guia->sinNotaCredito),
-                    number_format($guia->liquidacion),
+                    number_format($guia->neto, 0, ".", ""),
+                    number_format($guia->notaCredito, 0, ".", ""),
+                    number_format($guia->notaCreditoContenedor, 0, ".", ""),
+                    number_format($guia->sinNotaCredito, 0, ".", ""),
+                    number_format($guia->liquidacion, 0, ".", ""),
                 ];
             }
 
@@ -375,7 +375,7 @@ class EstadoPagoController extends Controller
                                     $producto->detalle,
                                     $cantidad,
                                     $producto->pivot->precio,
-                                    $subtotal,
+                                    number_format($subtotal, 0, ".", ""),
                                     $producto->pivot->observaciones
                                 ];
                             }
@@ -383,10 +383,10 @@ class EstadoPagoController extends Controller
                             $detGuia[] = [$requerimiento->centro->nombre, $guiaDespacho->fecha, $guiaDespacho->folio, $guiaDespacho->liquidacion];
                         }
                     }
-                    $detGuia[] = ["", "Total {$guiaDespacho->fecha}", "", $totalGuias];
+                    $detGuia[] = ["", "Total {$guiaDespacho->fecha}", "", number_format($totalGuias, 0, ".", "")];
                 }
             }
-            $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", $total];
+            $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", number_format($total, 0, ".", '')];
         }
 
         $export = new CierreEstadoPago($estadoPago, $detViveres, $detGuia);
