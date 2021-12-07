@@ -124,6 +124,7 @@
         </a>
         <a class="dropdown-item" href="{{route('estado_pago_general')}}">Estados de Pago</a>
         <a class="dropdown-item" href="{{route('estado_pago_resumen')}}">Resumen estados de pago</a>
+        <a class="dropdown-item" href="{{route('estado_pago_cierre')}}">Cierre estados de pago</a>
     </div>
 </li>
 @endif

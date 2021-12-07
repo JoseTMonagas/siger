@@ -277,6 +277,10 @@ class EstadoPagoController extends Controller
 
     public function cierre(Request $request)
     {
+        if (Auth::user()->userable instanceof \App\Empresa) {
+            return view("estado_pago.cierre");
+        }
+
         $empresas = Empresa::all();
         return view("estado_pago.cierre", compact("empresas"));
     }
@@ -319,7 +323,15 @@ class EstadoPagoController extends Controller
         $mes = $request->input("mes");
         $inicio = Carbon::create(null, $mes, 1, 0, 0, 0)->startOfMonth();
         $fin = Carbon::create(null, $mes, 1, 0, 0, 0)->endOfMonth();
-        $empresa = Empresa::findOrFail($request->input("empresa"));
+        $empresa = null;
+
+        if ($request->has("empresa")) {
+            $empresa = Empresa::findOrFail($request->input("empresa"));
+        } elseif (Auth::user()->userable instanceof \App\Empresa) {
+            $empresa = Auth::user()->userable;
+        } else {
+            return back();
+        }
 
         $requerimientos = $empresa->requerimientos()
             ->whereIn("estado", ["RECIBIDO", "RECIBIDO CON OBSERVACIONES"])

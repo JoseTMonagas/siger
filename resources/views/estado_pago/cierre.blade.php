@@ -2,10 +2,18 @@
 
 @section('title', 'Cierre Estado de Pago | MLine SIGER')
 
+@if ((Auth::user()->userable instanceof \App\CompassRole))
 @section('home-route', route('compass.home'))
 @section('nav-menu')
 @include('compass.menu')
 @endsection
+@else
+@section('home-route', route('cliente.home'))
+@section('nav-menu')
+@include('cliente.menu')
+@endsection
+@endif
+
 
 @section('main')
 <div class="container">
@@ -40,12 +48,14 @@
                             </span>
                         </div>
 
+                        @isset($empresas)
                         <div class="form-group col-md-4 d-flex flex-col">
                             <label for="empresa">Empresa:</label>
                             <span>
                                 <autoselect :items='@json($empresas)' item-text="razon_social" item-value="id" name="empresa"></autoselect>
                             </span>
                         </div>
+                        @endisset
                     </div>
 
                     <button class="btn btn-primary my-5">Generar cierre estado de pago</button>
