@@ -132,9 +132,10 @@
                                     @isset($guia->liquidado)
                                     <button @if($isLogistica) disabled @endif class="btn btn-info">LIQUIDADO</button>
                                     @else
-                                    @endisset
                                     <button @if($isLogistica) disabled @endif type="submit" class="btn btn-warning">NO LIQUIDADO</button>
+                                    @endisset
                                 </form>
+                                <a href="{{ route("estado_pago_nota_credito", $guia) }}" target="_blank">Ver NC Proforma</a>
                             </td>
                         </tr>
                         @endforeach
