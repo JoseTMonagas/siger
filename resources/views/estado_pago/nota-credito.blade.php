@@ -58,22 +58,22 @@
                         <td>{{ $producto->sku  }}</td>
                         <td>{{ $producto->detalle  }}</td>
                         <td>{{ $producto->pivot->precio  }}</td>
-                        <td>{{ $producto["subtotal"] }}</td>
+                        <td>{{ number_format($producto["subtotal"], 0, ".", "") }}</td>
                     </tr>
                     @endforeach
                 </tbody>
                 <tfooter>
                     <tr>
                         <td colspan="3" class="text-right">NETO</td>
-                        <td>{{ $neto  }}</td>
+                        <td>{{ number_format($neto, 0, ".", "")  }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="text-right">IVA</td>
-                        <td>{{ $iva  }}</td>
+                        <td>{{ number_format($iva, 0, ".", "")  }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="text-right">TOTAL</td>
-                        <td>{{ $total  }}</td>
+                        <td>{{ number_format($total, 0, ".", "")  }}</td>
                     </tr>
                 </tfooter>
             </table>
