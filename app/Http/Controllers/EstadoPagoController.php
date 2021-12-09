@@ -423,7 +423,7 @@ class EstadoPagoController extends Controller
                                 ];
                             }
 
-                            $detGuia[] = [$requerimiento->centro->nombre, $guiaDespacho->fecha, $guiaDespacho->folio, $guiaDespacho->liquidacion];
+                            $detGuia[] = [$requerimiento->centro->nombre, $guiaDespacho->fecha, $guiaDespacho->folio, $guiaDespacho->neto];
                         }
                     }
                     $detGuia[] = ["", "Total {$guiaDespacho->fecha}", "", number_format($totalGuias, 0, ".", "")];

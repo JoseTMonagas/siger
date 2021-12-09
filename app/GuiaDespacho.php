@@ -105,7 +105,8 @@ class GuiaDespacho extends Model
     public function getNetoAttribute()
     {
         return $this->productos->reduce(function ($carry, $producto) {
-            return $carry + ($producto->pivot->precio * $producto->pivot->real);
+            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            return $carry + ($producto->pivot->precio * $cantidad);
         });
     }
 
