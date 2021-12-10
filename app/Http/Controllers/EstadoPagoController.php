@@ -302,10 +302,10 @@ class EstadoPagoController extends Controller
         $neto = 0;
         $productos = $guiaDespacho->productos()->wherePivot("genera_nc", true)->get()->map(function (Producto $producto) {
             $cantidad = 0;
-            if ($producto->pivot->cantidad_recibido > 0) {
-                $cantidad = $producto->pivot->real - $producto->pivot->cantidad_recibido;
-            } else {
+            if ($producto->pivot->tipo_observacion_id == 2) {
                 $cantidad = $producto->pivot->real;
+            } else {
+                $cantidad = $producto->pivot->real - $producto->pivot->cantidad_recibido;
             }
             $producto["subtotal"] =  abs($cantidad * $producto->pivot->precio);
             return $producto;
@@ -404,11 +404,12 @@ class EstadoPagoController extends Controller
                                 number_format($guiaDespacho->liquidacion, 0, ".", ""),
                             ];
 
+                            $total += $guiaDespacho->liquidacion;
+                            $totalGuias += $guiaDespacho->neto;
+
                             foreach ($guiaDespacho->productos as $producto) {
-                                $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+                                $cantidad = $producto->pivot->real;
                                 $subtotal = $producto->pivot->precio * $cantidad;
-                                $total += $subtotal;
-                                $totalGuias += $subtotal;
                                 $detViveres[] = [
                                     date("d/m/Y", strtotime($guiaDespacho->created_at)),
                                     'PTO MONTT',

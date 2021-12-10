@@ -105,7 +105,7 @@ class GuiaDespacho extends Model
     public function getNetoAttribute()
     {
         return $this->productos->reduce(function ($carry, $producto) {
-            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            $cantidad = $producto->pivot->real;
             return $carry + ($producto->pivot->precio * $cantidad);
         });
     }
@@ -125,9 +125,9 @@ class GuiaDespacho extends Model
         return $this->productos->filter(function ($producto) {
             return $producto->pivot->genera_nc && !$producto->pivot->contenedor;
         })->reduce(function ($carry, $producto) {
-            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            $cantidad = abs($producto->pivot->real - $producto->pivot->cantidad_recibido);
             if ($producto->pivot->tipo_observacion_id == 2) {
-                $cantidad = 0;
+                $cantidad = $producto->pivot->real;
             }
             return $carry + ($producto->pivot->precio * $cantidad);
         });
@@ -138,7 +138,7 @@ class GuiaDespacho extends Model
         return $this->productos->filter(function ($producto) {
             return $producto->pivot->genera_nc && $producto->pivot->contenedor;
         })->reduce(function ($carry, $producto) {
-            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            $cantidad = abs($producto->pivot->real - $producto->pivot->cantidad_recibido);
             if ($producto->pivot->tipo_observacion_id == 2) {
                 $cantidad = 0;
             }
