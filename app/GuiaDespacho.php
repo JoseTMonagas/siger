@@ -27,7 +27,21 @@ class GuiaDespacho extends Model
 
     public function productos()
     {
-        return $this->belongsToMany('App\Producto')->withPivot('cantidad', 'precio', 'real', 'observacion', 'fecha_vencimiento', "tipo_observacion_id", "cantidad_recibido", "genera_nc", "liquidado", "contenedor");
+        return $this->belongsToMany('App\Producto')
+            ->withPivot(
+                'cantidad',
+                'precio',
+                'real',
+                'observacion',
+                'fecha_vencimiento',
+                "tipo_observacion_id",
+                "cantidad_recibido",
+                "genera_nc",
+                "liquidado",
+                "contenedor",
+                "comentario_centro",
+                "comentario_reclamo",
+            );
     }
 
     public function rechazos()

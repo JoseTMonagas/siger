@@ -17,7 +17,11 @@
 @section('main')
 <div class="container">
     <div class="card">
-        <h3 class="card-header font-bold text-xl">{{ $tipoObservacion->nombre  }}</h3>
+        <h3 class="card-header font-bold text-xl">
+            @foreach($tipoObservaciones as $observacion)
+            {{ $observacion->nombre  }} /
+            @endforeach
+        </h3>
         <div class="card-body">
             <span>
                 <b>Requerimiento:</b>

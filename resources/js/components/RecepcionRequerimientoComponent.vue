@@ -33,14 +33,18 @@
                       <td>{{ producto.detalle }}</td>
                       <td>{{ producto.pivot.real }}</td>
                       <td>
-                        <select class="form-control" v-model="producto.pivot.tipo_observacion_id">
+                        <select
+                          class="form-control"
+                          v-model="producto.pivot.tipo_observacion_id"
+                        >
                           <option
                             v-for="observacion in observaciones"
                             :value="observacion.id"
                             :key="
                               `${index}-${indexProductos}-${observacion.id}`
                             "
-                          >{{ observacion.nombre }}</option>
+                            >{{ observacion.nombre }}</option
+                          >
                         </select>
                         <small>{{ getObservacionLabel(producto) }}</small>
                       </td>
@@ -55,7 +59,10 @@
                         />
                       </td>
                       <td>
-                        <textarea class="form-control"></textarea>
+                        <textarea
+                          v-model="producto.pivot.comentario_centro"
+                          class="form-control"
+                        ></textarea>
                       </td>
                     </tr>
                   </tbody>
@@ -65,7 +72,9 @@
           </div>
           <div class="row justify-content-around">
             <div class="col-md-2">
-              <v-btn color="primary" @click="currentStep = ++index">Continuar</v-btn>
+              <v-btn color="primary" @click="currentStep = ++index"
+                >Continuar</v-btn
+              >
             </div>
           </div>
         </div>
@@ -100,9 +109,9 @@
                     <td>{{ summary.product.detalle }}</td>
                     <td>
                       {{
-                      getObservacionById(
-                      summary.product.pivot.tipo_observacion_id
-                      )
+                        getObservacionById(
+                          summary.product.pivot.tipo_observacion_id
+                        )
                       }}
                     </td>
                     <td>{{ summary.product.pivot.cantidad_recibido }}</td>
@@ -126,16 +135,16 @@ export default {
   props: {
     guiasDespacho: {
       type: Array,
-      required: true,
+      required: true
     },
     storeRoute: {
       type: String,
-      required: true,
+      required: true
     },
     observaciones: {
       type: Array,
-      required: true,
-    },
+      required: true
+    }
   },
   mounted() {
     for (let i = 0; i < this.guiasDespacho.length; i++) {
@@ -146,25 +155,25 @@ export default {
   computed: {
     lastStep() {
       return this.guiasDespacho.length;
-    },
+    }
   },
   watch: {
     currentStep() {
       this.summary = this.summaryObservacion();
-    },
+    }
   },
   data() {
     return {
       currentStep: 0,
       productosEditados: [],
       tiposObservaciones: [],
-      summary: undefined,
+      summary: undefined
     };
   },
   methods: {
     getContextClass(indexGuias, indexProductos) {
-      const rechazado =
-        this.productosEditados[indexGuias][indexProductos].rechazado;
+      const rechazado = this.productosEditados[indexGuias][indexProductos]
+        .rechazado;
 
       if (rechazado) {
         return "table-warning";
@@ -187,7 +196,7 @@ export default {
     },
     getObservacionLabel(producto) {
       const observacion = this.observaciones.find(
-        (observacion) => observacion.id == producto.pivot.tipo_observacion_id
+        observacion => observacion.id == producto.pivot.tipo_observacion_id
       );
 
       if (observacion !== undefined) {
@@ -203,14 +212,14 @@ export default {
     validateStep(indexGuia) {
       if (this.productosEditados.length > 0 && indexGuia > -1) {
         return this.productosEditados[indexGuia].some(
-          (producto) => producto.rechazado && producto.motivo == ""
+          producto => producto.rechazado && producto.motivo == ""
         );
       }
       return true;
     },
     getFolioByProductId(productId) {
-      const guia = this.guiasDespacho.find((guia) =>
-        guia.productos.some((producto) => producto.id == productId)
+      const guia = this.guiasDespacho.find(guia =>
+        guia.productos.some(producto => producto.id == productId)
       );
 
       if (guia != undefined) {
@@ -219,8 +228,8 @@ export default {
       return "";
     },
     getGuiaIdByProductId(productId) {
-      const guia = this.guiasDespacho.find((guia) =>
-        guia.productos.some((producto) => producto.id == productId)
+      const guia = this.guiasDespacho.find(guia =>
+        guia.productos.some(producto => producto.id == productId)
       );
 
       if (guia != undefined) {
@@ -230,7 +239,7 @@ export default {
     },
     getObservacionById(id) {
       const observacion = this.observaciones.find(
-        (observacion) => observacion.id == id
+        observacion => observacion.id == id
       );
 
       if (observacion !== undefined) {
@@ -242,7 +251,7 @@ export default {
       let rechazados = this.summaryObservacion();
       axios
         .post(this.storeRoute, { rechazados })
-        .catch(function (error) {
+        .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
@@ -260,13 +269,13 @@ export default {
           }
           console.log(error.config);
         })
-        .then((resp) => {
+        .then(resp => {
           if (resp.status == 201) {
             alert("Guardado exitosamente");
             window.location.href = resp.data;
           }
         });
-    },
-  },
+    }
+  }
 };
 </script>

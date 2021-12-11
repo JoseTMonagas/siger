@@ -49,6 +49,7 @@
                         <th>SKU</th>
                         <th>PRODUCTO</th>
                         <th>PRECIO UNT.</th>
+                        <th>CANTIDAD</th>
                         <th>TOTAL</th>
                     </tr>
                 </thead>
@@ -58,6 +59,7 @@
                         <td>{{ $producto->sku  }}</td>
                         <td>{{ $producto->detalle  }}</td>
                         <td>{{ $producto->pivot->precio  }}</td>
+                        <td>{{ $producto["cntd"]  }}</td>
                         <td>{{ number_format($producto["subtotal"], 0, ".", "") }}</td>
                     </tr>
                     @endforeach

@@ -14,19 +14,24 @@ class EstadoPagoActualizado extends Mailable
     use Queueable, SerializesModels;
 
     public $guiaDespacho;
-    public $tipoObservacion;
+    public $tipoObservaciones;
     public $productos;
+    public $concepto;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(GuiaDespacho $guiaDespacho, TipoObservacion $tipoObservacion)
+    public function __construct(GuiaDespacho $guiaDespacho, array $tipoObservaciones)
     {
         $this->guiaDespacho = $guiaDespacho;
-        $this->tipoObservacion = $tipoObservacion;
-        $this->productos = $guiaDespacho->getProductosByObservacionesId($tipoObservacion->id);
+        $this->tipoObservaciones = $tipoObservaciones;
+        $this->concepto =  [];
+
+        foreach ($tipoObservaciones as $tipoObservacion) {
+            $this->concepto[] = $tipoObservacion->id;
+        }
     }
 
     /**

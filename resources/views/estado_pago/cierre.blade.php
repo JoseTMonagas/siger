@@ -28,24 +28,12 @@
 
                     <div class="row">
                         <div class="form-group col-md-3 d-flex flex-col">
-                            <label class="" for="inicio">Mes:</label>
-                            <span class="">
-                                <select name="mes" class="form-control">
-                                    <option value="1">Enero</option>
-                                    <option value="2">Febrero</option>
-                                    <option value="3">Marzo</option>
-                                    <option value="4">Abril</option>
-                                    <option value="5">Mayo</option>
-                                    <option value="6">Junio</option>
-                                    <option value="7">Julio</option>
-                                    <option value="8">Agosto</option>
-                                    <option value="9">Septiembre</option>
-                                    <option value="10">Octubre</option>
-                                    <option value="11">Noviembre</option>
-                                    <option value="12">Diciembre</option>
-                                </select>
-                                <p class="text-muted">Obligatorio</p>
-                            </span>
+                            <label class="" for="inicio">Inicio:</label>
+                            <input class="form-control" name="inicio" type="date" />
+                        </div>
+                        <div class="form-group col-md-3 d-flex flex-col">
+                            <label class="" for="fin">Fin:</label>
+                            <input class="form-control" name="fin" type="date" />
                         </div>
 
                         @isset($empresas)

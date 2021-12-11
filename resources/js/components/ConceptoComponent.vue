@@ -1,16 +1,18 @@
 <template>
-  <v-simple-table fixed-header height="700">
-    <template v-slot:default>
+  <main>
+    <table class="table table-sm">
       <thead>
-        <tr>
+        <tr class="w-full">
           <th>SKU</th>
           <th>NOMBRE</th>
           <th>DESPACHADO</th>
           <th>RECIBIDO</th>
           <th>OBSERVACION</th>
-          <th>GENERA NC</th>
+          <th>NOTA CREDITO</th>
           <th v-if="generaReclamos">RECLAMAR</th>
-          <th>COMENTARIO</th>
+          <th>RECEPCION</th>
+          <th>RECLAMO</th>
+          <th>COMPASS</th>
           <th>ACEPTAR</th>
         </tr>
       </thead>
@@ -19,7 +21,7 @@
           v-for="(producto, indexProductos) in productos"
           :key="indexProductos"
         >
-          <td>{{ producto.sku }}</td>
+          <td class="w-2">{{ producto.sku }}</td>
           <td>{{ producto.detalle }}</td>
           <td>{{ producto.pivot.real }}</td>
           <td>{{ producto.pivot.cantidad_recibido }}</td>
@@ -72,11 +74,29 @@
           </td>
           <td>
             <textarea
-              :disabled="generaReclamos"
-              v-model="producto.pivot.observacion"
               class="form-control"
-            ></textarea>
+              disabled
+              v-model="producto.pivot.comentario_centro"
+            >
+            </textarea>
           </td>
+          <td>
+            <textarea
+              class="form-control"
+              disabled
+              v-model="producto.pivot.comentario_reclamo"
+            >
+            </textarea>
+          </td>
+          <td>
+            <textarea
+              class="form-control"
+              disabled
+              v-model="producto.pivot.observacion"
+            >
+            </textarea>
+          </td>
+
           <td>
             <button
               :disabled="generaReclamos"
@@ -92,19 +112,17 @@
           </td>
         </tr>
       </tbody>
-      <tfoot v-if="!generaReclamos">
-        <div class="flex flex-row justify-around">
-          <button @click="onActualizacionClick()" class="btn btn-outline-info">
-            ENVIAR ACTUALIZACION
-          </button>
+    </table>
+    <div class="flex flex-row justify-around" v-if="!generaReclamos">
+      <button @click="onActualizacionClick()" class="btn btn-outline-info">
+        ENVIAR ACTUALIZACION
+      </button>
 
-          <button @click="onGuardarTodoClick()" class="btn btn-outline-success">
-            GUARDAR TODO
-          </button>
-        </div>
-      </tfoot>
-    </template>
-  </v-simple-table>
+      <button @click="onGuardarTodoClick()" class="btn btn-outline-success">
+        GUARDAR TODO
+      </button>
+    </div>
+  </main>
 </template>
 <script>
 export default {
@@ -191,7 +209,7 @@ export default {
     onGuardarTodoClick() {
       const productos = this.productos;
       axios
-        .post(this.massiveRoute, { productos })
+        .post(this.massiveRoute, this.productos)
         .catch(function(error) {
           if (error.response) {
             // The request was made and the server responded with a status code

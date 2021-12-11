@@ -99,14 +99,16 @@ class EstadoPagoController extends Controller
         return view("estado_pago.general", compact("aceptadas", "rechazadas", "observadas", "empresas"));
     }
 
-    public function concepto(GuiaDespacho $guiaDespacho, TipoObservacion $tipoObservacion)
+    public function concepto(GuiaDespacho $guiaDespacho, Request $request)
     {
-        $productos = $guiaDespacho->productos()->wherePivot("tipo_observacion_id", $tipoObservacion->id)->get();
+        $ids = explode(",", $request->input("concepto"));
+        $tipoObservaciones = TipoObservacion::whereIn("id", $ids)->get();
+        $productos = $guiaDespacho->productos()->wherePivotIn("tipo_observacion_id", [$ids])->get();
         $storeRoute = route("estado_pago_concepto_store", [$guiaDespacho]);
-        $actualizacionRoute = route("estado_pago_actualizado", [$guiaDespacho, $tipoObservacion]);
-        $observaciones = TipoObservacion::all();
+        $actualizacionRoute = route("estado_pago_actualizado", ["guiaDespacho" => $guiaDespacho, "concepto" => implode(",", $ids)]);
+        $observaciones = TipoObservacion::where("id", ">=", 2)->get();
 
-        return view("estado_pago.concepto", compact("guiaDespacho", "tipoObservacion", "productos", "storeRoute", "observaciones", "actualizacionRoute"));
+        return view("estado_pago.concepto", compact("guiaDespacho", "tipoObservaciones", "productos", "storeRoute", "observaciones", "actualizacionRoute"));
     }
 
     public function conceptoStore(GuiaDespacho $guiaDespacho, Request $request)
@@ -139,15 +141,20 @@ class EstadoPagoController extends Controller
         return response()->json();
     }
 
-    public function enviarActualizacion(GuiaDespacho $guiaDespacho, TipoObservacion $tipoObservacion)
+    public function enviarActualizacion(GuiaDespacho $guiaDespacho, Request $request)
     {
+        $ids = explode(",", $request->input("concepto"));
+        $tipoObservaciones = TipoObservacion::whereIn("id", $ids)->get();
         $empresa = $guiaDespacho->requerimiento->centro->empresa;
         $users = User::where("userable_type", "App\Empresa")->where("userable_id", $empresa->id)->where('logistica', 1)->get();
         $emails = [];
         foreach ($users as $user) {
             $emails[] = $user->email;
         }
-        Mail::to($emails)->send(new EstadoPagoActualizado($guiaDespacho, $tipoObservacion));
+        try {
+            Mail::to($emails)->send(new EstadoPagoActualizado($guiaDespacho, $tipoObservaciones));
+        } catch (\Exception $e) {
+        }
         return response()->json();
     }
 
@@ -307,6 +314,7 @@ class EstadoPagoController extends Controller
             } else {
                 $cantidad = $producto->pivot->real - $producto->pivot->cantidad_recibido;
             }
+            $producto["cntd"] = $cantidad;
             $producto["subtotal"] =  abs($cantidad * $producto->pivot->precio);
             return $producto;
         });
@@ -320,9 +328,8 @@ class EstadoPagoController extends Controller
 
     public function generarCierre(Request $request)
     {
-        $mes = $request->input("mes");
-        $inicio = Carbon::create(null, $mes, 1, 0, 0, 0)->startOfMonth();
-        $fin = Carbon::create(null, $mes, 1, 0, 0, 0)->endOfMonth();
+        $inicio = $request->inicio;
+        $fin = $request->fin;
         $empresa = null;
 
         if ($request->has("empresa")) {
@@ -348,7 +355,7 @@ class EstadoPagoController extends Controller
         $estadoPago = [
             ["ESTADO DE PAGO"],
             [""],
-            ["PERIODO", $fin->format("M - Y")],
+            ["PERIODO", "$inicio -> $fin"],
             ["CONTRATO", $empresa->razon_social],
             ["SECTOR", "PUERTO MONTT"],
             ["SERVICIOS", "VIVERES"],
@@ -359,7 +366,7 @@ class EstadoPagoController extends Controller
         ];
 
         $detViveres = [
-            ["PACK ABASTECIMIENTO CENTROS {$fin->format('M Y')}"],
+            ["PACK ABASTECIMIENTO CENTROS $inicio -> $fin"],
             [''],
             [
                 'FECHA',
@@ -371,7 +378,8 @@ class EstadoPagoController extends Controller
                 'CANTIDAD',
                 'UNIT',
                 'TOTAL',
-                'OBSERVACIONES'
+                'OBSERVACION',
+                "NOTA CREDITO"
             ]
         ];
 
@@ -410,6 +418,7 @@ class EstadoPagoController extends Controller
                             foreach ($guiaDespacho->productos as $producto) {
                                 $cantidad = $producto->pivot->real;
                                 $subtotal = $producto->pivot->precio * $cantidad;
+                                $tipoObservacion = TipoObservacion::find($producto->pivot->tipo_observacion_id);
                                 $detViveres[] = [
                                     date("d/m/Y", strtotime($guiaDespacho->created_at)),
                                     'PTO MONTT',
@@ -420,7 +429,8 @@ class EstadoPagoController extends Controller
                                     $cantidad,
                                     $producto->pivot->precio,
                                     number_format($subtotal, 0, ".", ""),
-                                    $producto->pivot->observaciones
+                                    $tipoObservacion->nombre,
+                                    ($producto->pivot->genera_nc) ? "SI" : '',
                                 ];
                             }
 
