@@ -103,7 +103,7 @@ class EstadoPagoController extends Controller
     {
         $ids = explode(",", $request->input("concepto"));
         $tipoObservaciones = TipoObservacion::whereIn("id", $ids)->get();
-        $productos = $guiaDespacho->productos()->wherePivotIn("tipo_observacion_id", [$ids])->get();
+        $productos = $guiaDespacho->productos()->wherePivotIn("tipo_observacion_id", $ids)->get();
         $storeRoute = route("estado_pago_concepto_store", [$guiaDespacho]);
         $actualizacionRoute = route("estado_pago_actualizado", ["guiaDespacho" => $guiaDespacho, "concepto" => implode(",", $ids)]);
         $observaciones = TipoObservacion::where("id", ">=", 2)->get();
