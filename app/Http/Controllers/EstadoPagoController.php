@@ -122,8 +122,7 @@ class EstadoPagoController extends Controller
 
     public function conceptoMassiveStore(GuiaDespacho $guiaDespacho, Request $request)
     {
-        $productos = $request->input("productos");
-
+        $productos = $request->input();
         foreach ($productos as $producto) {
             $producto["pivot"]["liquidado"] = true;
             $guiaDespacho->productos()->updateExistingPivot($producto["id"], $producto["pivot"]);
