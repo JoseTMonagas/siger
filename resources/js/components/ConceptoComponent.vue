@@ -91,7 +91,7 @@
           <td>
             <textarea
               class="form-control"
-              disabled
+              :disabled="generaReclamos"
               v-model="producto.pivot.observacion"
             >
             </textarea>
@@ -285,6 +285,7 @@ export default {
       });
     },
     onActualizacionClick() {
+      alert("Se enviará un correo al cliente.");
       axios
         .post(this.actualizacionRoute)
         .catch(function(error) {
