@@ -23,7 +23,7 @@ class EstadoPagoActualizado extends Mailable
      *
      * @return void
      */
-    public function __construct(GuiaDespacho $guiaDespacho, array $tipoObservaciones)
+    public function __construct(GuiaDespacho $guiaDespacho, $tipoObservaciones)
     {
         $this->guiaDespacho = $guiaDespacho;
         $this->tipoObservaciones = $tipoObservaciones;
