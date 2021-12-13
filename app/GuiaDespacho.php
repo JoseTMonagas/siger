@@ -127,9 +127,10 @@ class GuiaDespacho extends Model
     public function getSinNotaCreditoAttribute()
     {
         return $this->productos->filter(function ($producto) {
-            return !$producto->pivot->genera_nc;
+            return !$producto->pivot->genera_nc && !$producto->pivot->contenedor && $producto->pivot->tipo_observacion_id >= 2;
         })->reduce(function ($carry, $producto) {
-            return $carry + ($producto->pivot->precio * $producto->pivot->real);
+            $cantidad = $producto->pivot->cantidad_recibido ?? $producto->pivot->real;
+            return $carry + ($producto->pivot->precio * $cantidad);
         });
     }
 
