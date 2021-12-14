@@ -374,11 +374,12 @@ class EstadoPagoController extends Controller
                 'CENTRO',
                 'GUIA',
                 'PRODUCTO',
-                'CANTIDAD',
+                'CANTIDAD DESPACHADA',
                 'UNIT',
                 'TOTAL',
                 'OBSERVACION',
-                "NOTA CREDITO"
+                "NOTA CREDITO",
+                "CANTIDAD RECIBIDA"
             ]
         ];
 
@@ -418,6 +419,17 @@ class EstadoPagoController extends Controller
                                 $cantidad = $producto->pivot->real;
                                 $subtotal = $producto->pivot->precio * $cantidad;
                                 $tipoObservacion = TipoObservacion::find($producto->pivot->tipo_observacion_id);
+                                $recibido = $producto->pivot->cantidad_recibido;
+                                switch ($producto->pivot->tipo_observacion_id) {
+                                    case 1:
+                                        $recibido = $cantidad;
+                                        break;
+                                    case 2:
+                                        $recibido = "0";
+                                        break;
+                                    default:
+                                        $recibido = $producto->pivot->cantidad_recibido;
+                                }
                                 $detViveres[] = [
                                     date("d/m/Y", strtotime($guiaDespacho->created_at)),
                                     'PTO MONTT',
@@ -430,6 +442,7 @@ class EstadoPagoController extends Controller
                                     number_format($subtotal, 0, ".", ""),
                                     $tipoObservacion->nombre,
                                     ($producto->pivot->genera_nc) ? "SI" : '',
+                                    $recibido
                                 ];
                             }
 
