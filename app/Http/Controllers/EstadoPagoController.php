@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Centro;
+use App\Cierre;
 use App\Empresa;
 use App\Exports\ArrayExport;
 use App\Exports\CierreEstadoPago;
@@ -453,7 +454,17 @@ class EstadoPagoController extends Controller
                 }
             }
             $estadoPago[] = ["VIVERES MES CENTRO LOGISTICO", number_format($total, 0, ".", '')];
+
+            if ($request->has("closed") && boolval($request->input("closed"))) {
+                Cierre::create([
+                    "empresa_id" => $empresa->id,
+                    "desde" => $inicio,
+                    "hasta" => $fin,
+                    "monto" => $total
+                ]);
+            }
         }
+
 
         $export = new CierreEstadoPago($estadoPago, $detViveres, $detGuia, $liquidacion);
         return Excel::download($export, "cierre-{$empresa->razon_social}.xlsx");

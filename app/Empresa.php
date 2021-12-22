@@ -92,6 +92,11 @@ class Empresa extends Model
         return $this->hasOne('App\Horario');
     }
 
+    public function cierres()
+    {
+        return $this->hasMany("App\Cierre");
+    }
+
     public function getProductosVigentesAttribute()
     {
         $fecha = date("Y-m-d");

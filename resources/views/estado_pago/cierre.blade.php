@@ -46,7 +46,8 @@
                         @endisset
                     </div>
 
-                    <button class="btn btn-primary my-5">Generar cierre estado de pago</button>
+                    <button type="submit" name="closed" value="0" class="btn btn-primary my-5">Exportar a Excel</button>
+                    <button type="submit" name="closed" value="1" class="btn btn-primary my-5">Generar Cierrre</button>
                 </form>
 
             </div>
