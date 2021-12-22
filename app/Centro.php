@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -54,6 +55,11 @@ class Centro extends Model
     public function presupuestos()
     {
         return $this->morphMany('App\Presupuesto', 'presupuesteable');
+    }
+
+    public function ordenesCompras()
+    {
+        return $this->belongsToMany("App\OrdenCompra");
     }
 
     /**
@@ -116,6 +122,24 @@ class Centro extends Model
             return [$index => $totalMes];
         });
         return $total;
+    }
+
+    public function cierre(string $desde, string $hasta)
+    {
+        $guias = $this->guiasDespacho()->whereHas("productos", function (Builder $query) {
+            $query->whereIn("tipo_observacion_id", [1, 2, 3, 4, 5, 6, 7, 8]);
+        })
+            ->whereDate("fecha", ">=", $desde)
+            ->whereDate("fecha", "<=", $hasta)
+            ->whereNotNull("febos_id")
+            ->get();
+
+        $cierre = 0;
+        foreach ($guias as $guia) {
+            $cierre += $guia->liquidacion;
+        }
+
+        return $cierre;
     }
 
     public function clearPresupuesto($year)

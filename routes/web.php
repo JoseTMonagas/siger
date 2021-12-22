@@ -365,5 +365,22 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post("cierre", "EstadoPagoController@generarCierre")->name("estado_pago_generar_cierre");
 
         Route::get("nota-credito/{guiaDespacho}", "EstadoPagoController@notaCredito")->name("estado_pago_nota_credito");
+
+        Route::get("orden-compra", "ControlOrdenCompraCentroController@index")->name("orden_compra_index");
+        Route::post("orden-compra", "ControlOrdenCompraCentroController@filtrar")->name("orden_compra_filtrar");
+    });
+
+    Route::group(["prefix" => "orden_compra"], function () {
+        Route::get("index", "OrdenCompraController@index")->name("orden_compra_index");
+        Route::post("index", "OrdenCompraController@filtrar")->name("orden_compra_filtrar");
+
+        Route::get("cierre/{cierre}", "OrdenCompraController@cierre")->name("orden_compra_cierre");
+
+        Route::get("crear/{cierre}", "OrdenCompraController@create")->name("orden_compra_create");
+        Route::post("crear/{cierre}", "OrdenCompraController@store")->name("orden_compra_store");
+        Route::delete("{ordenCompra}", "OrdenCompraController@destroy")->name("orden_compra_delete");
+
+        Route::get("edit/{ordenCompra}", "OrdenCompraController@edit")->name("orden_compra_edit");
+        Route::post("update/{ordenCompra}", "OrdenCompraController@update")->name("orden_compra_update");
     });
 });
