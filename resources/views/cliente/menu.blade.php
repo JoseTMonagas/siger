@@ -127,4 +127,15 @@
         <a class="dropdown-item" href="{{route('estado_pago_cierre')}}">Cierre estados de pago</a>
     </div>
 </li>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownCierre" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-clipboard-check mr-2"></i>
+        Control OC/NC/FE
+    </a>
+    <div class="dropdown-menu">
+        <a class="dropdown-item" href="{{route('orden_compra_index')}}">Orden de Compra</a>
+        <a class="dropdown-item" href="{{route('nota_credito_index')}}">Nota de Credito</a>
+        <a class="dropdown-item" href="{{route('factura_electronica_index')}}">Factura Electronica</a>
+    </div>
+</li>
 @endif
