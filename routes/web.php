@@ -383,4 +383,18 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get("edit/{ordenCompra}", "OrdenCompraController@edit")->name("orden_compra_edit");
         Route::post("update/{ordenCompra}", "OrdenCompraController@update")->name("orden_compra_update");
     });
+
+    Route::group(["prefix" => "nota_credito"], function () {
+        Route::get("index", "NotaCreditoTributariaController@index")->name("nota_credito_index");
+        Route::post("index", "NotaCreditoTributariaController@filtrar")->name("nota_credito_filtrar");
+
+        Route::get("cierre/{cierre}", "NotaCreditoTributariaController@cierre")->name("nota_credito_cierre");
+
+        Route::get("crear/{cierre}", "NotaCreditoTributariaController@create")->name("nota_credito_create");
+        Route::post("crear/{cierre}", "NotaCreditoTributariaController@store")->name("nota_credito_store");
+        Route::delete("{notaCreditoTributaria}", "NotaCreditoTributariaController@destroy")->name("nota_credito_delete");
+
+        Route::get("edit/{notaCreditoTributaria}", "NotaCreditoTributariaController@edit")->name("nota_credito_edit");
+        Route::post("update/{notaCreditoTributaria}", "NotaCreditoTributariaController@update")->name("nota_credito_update");
+    });
 });

@@ -62,6 +62,11 @@ class Centro extends Model
         return $this->belongsToMany("App\OrdenCompra");
     }
 
+    public function notasCredito()
+    {
+        return $this->belongsToMany("App\NotaCreditoTributaria");
+    }
+
     /**
      * Retorna los Requerimientos de ese Centro segun el Id de Estado
      *

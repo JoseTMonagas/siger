@@ -19,4 +19,9 @@ class Cierre extends Model
     {
         return $this->hasMany("App\OrdenCompra");
     }
+
+    public function notasCredito(): HasMany
+    {
+        return $this->hasMany("App\NotaCreditoTributaria");
+    }
 }
