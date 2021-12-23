@@ -24,4 +24,9 @@ class Cierre extends Model
     {
         return $this->hasMany("App\NotaCreditoTributaria");
     }
+
+    public function facturasElectronica(): HasMany
+    {
+        return $this->hasMany("App\FacturaElectronica");
+    }
 }

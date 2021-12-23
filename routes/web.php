@@ -397,4 +397,18 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get("edit/{notaCreditoTributaria}", "NotaCreditoTributariaController@edit")->name("nota_credito_edit");
         Route::post("update/{notaCreditoTributaria}", "NotaCreditoTributariaController@update")->name("nota_credito_update");
     });
+
+    Route::group(["prefix" => "factura_electronica"], function () {
+        Route::get("index", "FacturaElectronicaController@index")->name("factura_electronica_index");
+        Route::post("index", "FacturaElectronicaController@filtrar")->name("factura_electronica_filtrar");
+
+        Route::get("cierre/{cierre}", "FacturaElectronicaController@cierre")->name("factura_electronica_cierre");
+
+        Route::get("crear/{cierre}", "FacturaElectronicaController@create")->name("factura_electronica_create");
+        Route::post("crear/{cierre}", "FacturaElectronicaController@store")->name("factura_electronica_store");
+        Route::delete("{facturaElectronica}", "FacturaElectronicaController@destroy")->name("factura_electronica_delete");
+
+        Route::get("edit/{facturaElectronica}", "FacturaElectronicaController@edit")->name("factura_electronica_edit");
+        Route::post("update/{facturaElectronica}", "FacturaElectronicaController@update")->name("factura_electronica_update");
+    });
 });

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class OrdenCompra extends Model
+class FacturaElectronica extends Model
 {
     protected $fillable = ["cierre_id", "fecha", "folio", "monto", "documento"];
 
@@ -15,13 +15,8 @@ class OrdenCompra extends Model
         return $this->belongsTo("App\Cierre");
     }
 
-    public function centros(): BelongsToMany
+    public function ordenesCompra(): BelongsToMany
     {
-        return $this->belongsToMany("App\Centro")->withPivot("monto");
-    }
-
-    public function facturasElectronica(): BelongsToMany
-    {
-        return $this->belongsToMany("App\FacturaElectronica")->withPivot("monto");
+        return $this->belongsToMany("App\OrdenCompra")->withPivot("monto");
     }
 }
