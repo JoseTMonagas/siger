@@ -59,12 +59,12 @@ class Centro extends Model
 
     public function ordenesCompras()
     {
-        return $this->belongsToMany("App\OrdenCompra");
+        return $this->belongsToMany("App\OrdenCompra")->withPivot("monto");
     }
 
     public function notasCredito()
     {
-        return $this->belongsToMany("App\NotaCreditoTributaria");
+        return $this->belongsToMany("App\NotaCreditoTributaria")->withPivot("monto");
     }
 
     /**

@@ -246,4 +246,18 @@ class Requerimiento extends Model
             return false;
         }
     }
+
+    public function getEstadoPagoAttribute()
+    {
+        return $this->guiasDespacho->reduce(function ($carry, $item) {
+            return $carry + $item->liquidacion;
+        });
+    }
+
+    public function getNotaCreditoProformaAttribute()
+    {
+        return $this->guiasDespacho->reduce(function ($carry, $item) {
+            return $carry + ($item->notaCredito + $item->notaCreditoContenedor);
+        });
+    }
 }

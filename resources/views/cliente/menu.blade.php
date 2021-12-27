@@ -136,6 +136,7 @@
         <a class="dropdown-item" href="{{route('orden_compra_index')}}">Orden de Compra</a>
         <a class="dropdown-item" href="{{route('nota_credito_index')}}">Nota de Credito</a>
         <a class="dropdown-item" href="{{route('factura_electronica_index')}}">Factura Electronica</a>
+        <a class="dropdown-item" href="{{route('conciliacion_index')}}">Conciliación</a>
     </div>
 </li>
 @endif

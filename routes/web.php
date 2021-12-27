@@ -411,4 +411,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get("edit/{facturaElectronica}", "FacturaElectronicaController@edit")->name("factura_electronica_edit");
         Route::post("update/{facturaElectronica}", "FacturaElectronicaController@update")->name("factura_electronica_update");
     });
+
+    Route::group(["prefix" => "conciliacion"], function () {
+        Route::get("index", "ConciliacionController@index")->name("conciliacion_index");
+        Route::post("index", "ConciliacionController@filtrar")->name("conciliacion_filtrar");
+
+        Route::get("{cierre}", "ConciliacionController@conciliacion")->name("conciliacion_centro");
+    });
 });
