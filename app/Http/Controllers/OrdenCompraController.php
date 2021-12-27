@@ -182,6 +182,7 @@ class OrdenCompraController extends Controller
      */
     public function destroy(OrdenCompra $ordenCompra): RedirectResponse
     {
+        $ordenCompra->centros()->detach();
         $ordenCompra->delete();
 
         return back();

@@ -184,6 +184,7 @@ class NotaCreditoTributariaController extends Controller
      */
     public function destroy(NotaCreditoTributaria $notaCreditoTributaria): RedirectResponse
     {
+        $notaCreditoTributaria->centros()->detach();
         $notaCreditoTributaria->delete();
 
         return back();

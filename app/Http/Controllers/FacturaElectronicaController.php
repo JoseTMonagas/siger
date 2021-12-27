@@ -182,6 +182,7 @@ class FacturaElectronicaController extends Controller
      */
     public function destroy(FacturaElectronica $facturaElectronica): RedirectResponse
     {
+        $facturaElectronica->ordenesCompra()->detach();
         $facturaElectronica->delete();
 
         return back();
