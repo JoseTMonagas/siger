@@ -21,7 +21,7 @@
         <div class="card-body">
             <div class="container mt-2">
                 <header class="d-flex flex-row justify-content-end my-2">
-                    <a class="btn btn-outline-success" href="{{ route("factura_electronica_create", $cierre) }}">Crear OC</a>
+                    <a class="btn btn-outline-success" href="{{ route("factura_electronica_create", $cierre) }}">Crear FE</a>
                 </header>
                 <table class="table table-sm" id="datatable">
                     <thead>
