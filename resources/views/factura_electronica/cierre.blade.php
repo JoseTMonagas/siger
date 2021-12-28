@@ -40,7 +40,7 @@
                             <td>{{ $factura->monto  }}</td>
                             <td>
                                 <div class="d-inline-flex justify-content-around">
-                                    <a href="{{ asset($factura->documento) }}">Ver PDF</a>
+                                    <a href="{{ asset($factura->documento) }}" target="_BLANK">Ver PDF</a>
                                     <a href="{{ route("factura_electronica_edit", $factura) }}" class="btn btn-warning mx-2">Editar</a>
                                     <form method="POST" action="{{ route('factura_electronica_delete', $factura)  }}">
                                         @csrf

@@ -40,7 +40,7 @@
                             <td>{{ $orden->monto  }}</td>
                             <td>
                                 <div class="d-inline-flex justify-content-around">
-                                    <a href="{{ asset($orden->documento) }}">Ver PDF</a>
+                                    <a href="{{ asset($orden->documento) }}" target="_BLANK">Ver PDF</a>
                                     <a href="{{ route("orden_compra_edit", $orden) }}" class="btn btn-warning mx-2">Editar</a>
                                     <form method="POST" action="{{ route('orden_compra_delete', $orden)  }}">
                                         @csrf

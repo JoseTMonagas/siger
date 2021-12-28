@@ -40,7 +40,7 @@
                             <td>{{ $nota->monto  }}</td>
                             <td>
                                 <div class="d-inline-flex justify-content-around">
-                                    <a href="{{ asset($nota->documento) }}">Ver PDF</a>
+                                    <a href="{{ asset($nota->documento) }}" target="_BLANK">Ver PDF</a>
                                     <a href="{{ route("nota_credito_edit", $nota) }}" class="btn btn-warning mx-2">Editar</a>
                                     <form method="POST" action="{{ route('nota_credito_delete', $nota)  }}">
                                         @csrf
