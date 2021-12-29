@@ -23,12 +23,12 @@
                 <div class="d-flex flex-column mb-4">
                     <span>
                         <b>Liquidacion:</b>
-                        $ {{ number_format($cierre->monto, 0, ".", "") }}
+                        $ {{ number_format($cierre->monto, 0) }}
                     </span>
                     <span>
                         <b>Factura:</b>
                         <a href="#" data-toggle="modal" data-target="#modalResumenFacturas">
-                            $ {{ number_format($totalFacturasElectronica, 0, ".", "")  }}
+                            $ {{ number_format($totalFacturasElectronica, 0)  }}
                         </a>
                         <!-- Modal -->
                         <div class="modal fade" id="modalResumenFacturas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -51,7 +51,7 @@
                                                 <tr>
                                                     <td>{{ $factura->fecha }}</td>
                                                     <td>{{ $factura->folio }}</td>
-                                                    <td>{{ $factura->monto }}</td>
+                                                    <td>$ {{ number_format($factura->monto, 0) }}</td>
                                                     <td>
                                                         <a href="{{ asset($factura->documento)  }}" target="_BLANK">Ver PDF</a>
                                                     </td>
@@ -67,7 +67,7 @@
                     <span>
                         <b>Orden de Compra:</b>
                         <a href="#" data-toggle="modal" data-target="#modalResumenOC">
-                            $ {{ number_format($totalOrdenesCompra, 0, ".", "")  }}
+                            $ {{ number_format($totalOrdenesCompra, 0)  }}
                         </a>
                         <!-- Modal -->
                         <div class="modal fade" id="modalResumenOC" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -90,7 +90,7 @@
                                                 <tr>
                                                     <td>{{ $orden->fecha }}</td>
                                                     <td>{{ $orden->folio }}</td>
-                                                    <td>{{ $orden->monto }}</td>
+                                                    <td>$ {{ number_format($orden->monto, 0) }}</td>
                                                     <td>
                                                         <a href="{{ asset($orden->documento)  }}" target="_BLANK">Ver PDF</a>
                                                     </td>
@@ -106,7 +106,7 @@
                     <span>
                         <b>Notas de Credito:</b>
                         <a href="#" data-toggle="modal" data-target="#modalResumenNC">
-                            $ {{ number_format($totalNotasCredito, 0, ".", "")  }}
+                            $ {{ number_format($totalNotasCredito, 0)  }}
                         </a>
                         <!-- Modal -->
                         <div class="modal fade" id="modalResumenNC" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -129,7 +129,7 @@
                                                 <tr>
                                                     <td>{{ $notas->fecha }}</td>
                                                     <td>{{ $notas->folio }}</td>
-                                                    <td>{{ $notas->monto }}</td>
+                                                    <td>$ {{ $notas->monto }}</td>
                                                     <td>
                                                         <a href="{{ asset($notas->documento)  }}" target="_BLANK">Ver PDF</a>
                                                     </td>
@@ -184,7 +184,7 @@
                                                         <tr>
                                                             <td>{{ $orden->fecha }}</td>
                                                             <td>{{ $orden->folio }}</td>
-                                                            <td>{{ $orden->monto }}</td>
+                                                            <td>$ {{ number_format($orden->monto) }}</td>
                                                             <td>
                                                                 <a href="{{ asset($orden->documento)  }}" target="_BLANK">Ver PDF</a>
                                                             </td>
@@ -223,7 +223,7 @@
                                                         <tr>
                                                             <td>{{ $nota->fecha }}</td>
                                                             <td>{{ $nota->folio }}</td>
-                                                            <td>{{ $nota->monto }}</td>
+                                                            <td>$ {{ number_format($nota->monto, 0) }}</td>
                                                             <td>
                                                                 <a href="{{ asset($nota->documento)  }}" target="_BLANK">Ver PDF</a>
                                                             </td>

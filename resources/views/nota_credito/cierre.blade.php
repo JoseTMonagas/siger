@@ -37,16 +37,16 @@
                         <tr>
                             <td>{{ $nota->fecha  }}</td>
                             <td>{{ $nota->folio  }}</td>
-                            <td>{{ $nota->monto  }}</td>
+                            <td>$ {{ number_format($nota->monto, 0)  }}</td>
                             <td>
                                 <div class="d-inline-flex justify-content-around">
                                     <a href="{{ asset($nota->documento) }}" target="_BLANK">Ver PDF</a>
                                     <a href="{{ route("nota_credito_edit", $nota) }}" class="btn btn-warning mx-2">Editar</a>
-                                    <form method="POST" action="{{ route('nota_credito_delete', $nota)  }}">
+                                    <form method="POST" action="{{ route('nota_credito_delete', $nota)  }}" class="deleteForm">
                                         @csrf
                                         @method("DELETE")
 
-                                        <button class="btn btn-danger" type="submit">Eliminar</button>
+                                        <button class="btn btn-danger deleteBtn" type="submit">Eliminar</button>
                                     </form>
                                 </div>
                             </td>
@@ -58,4 +58,13 @@
         </div>
     </div>
 </div>
+@endsection
+@section("js")
+<script type="text/javascript">
+    $(".deleteBtn").click((event) => {
+        if (!confirm("Confirme si desea eliminar este documento")) {
+            event.preventDefault();
+        };
+    });
+</script>
 @endsection

@@ -61,7 +61,7 @@
                         <tr>
                             <td>{{ date_format($cierre->created_at, "d/m/Y") }}-{{ $cierre->id  }}</td>
                             <td>{{ $cierre->desde  }} -> {{ $cierre->hasta  }}</td>
-                            <td>{{ $cierre->monto  }}</td>
+                            <td>$ {{ number_format($cierre->monto, 0)  }}</td>
                             <td>
                                 <a href="{{ route('orden_compra_cierre', $cierre)  }}">Seleccionar</a>
                             </td>
