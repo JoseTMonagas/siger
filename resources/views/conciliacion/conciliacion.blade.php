@@ -144,24 +144,60 @@
                     </span>
                 </div>
 
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th class="border-r text-left">RESUMEN EDP</th>
+                            <th class="text-right">LIQ INTERNA</th>
+                            <th class="text-right">LIQ EXTERNA</th>
+                            <th class="border-r text-right">DIF. LIQ</th>
+                            <th class="text-right">MONTO</th>
+                            <th class="text-right">OC</th>
+                            <th class="border-r text-right">DIF. MNT/OC</th>
+                            <th class="text-right">NC PF</th>
+                            <th class="text-right">NC T</th>
+                            <th class="border-r text-right">DIF. NC</th>
+                            <th class="text-right">CUADRATURA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border-r text-left">{{ date_format($cierre->created_at, "d/m/Y") }}-{{ $cierre->id  }}</td>
+                            <td class="text-right">{{ number_format($cierre->monto, 0)  }}</td>
+                            <td class="text-right">{{ number_format($liquidacionDoc)  }}</td>
+                            <td class="border-r text-right">{{ number_format($deltaLiq, 0)  }}</td>
+                            <td class="text-right">{{ number_format($totalNeto, 0)  }}</td>
+                            <td class="text-right">{{ number_format($totalOrdenesCompra, 0)  }}</td>
+                            <td class="border-r text-right">{{ number_format($deltaNetoOC, 0)  }}</td>
+                            <td class="text-right">{{ number_format($totalNotasCreditoPF, 0) }}</td>
+                            <td class="text-right">{{ number_format($totalNotasCredito, 0)  }}</td>
+                            <td class="border-r text-right">{{ number_format($deltaNC, 0)  }}</td>
+                            <td class="text-right">{{ number_format($cuadratura, 0)  }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 <table class="table table-sm" id="datatable">
                     <thead>
                         <tr>
                             <th class="text-right">Centro</th>
-                            <th class="text-left">EDP</th>
+                            <th class="text-left">MONTO</th>
                             <th class="text-left">OC</th>
+                            <th class="text-left">DIF. MONTO-OC</th>
                             <th class="text-left">NC PF</th>
                             <th class="text-left">NC Trib.</th>
+                            <th class="text-left">DIF. NC</th>
+
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($conciliacion as $centro)
                         <tr>
                             <td class="text-right">{{ $centro["centro"]->nombre  }}</td>
-                            <td class="text-left">$ {{ number_format($centro["estadoPago"], 0, ".", "")  }}</td>
+                            <td class="text-left">$ {{ number_format($centro["neto"], 0)  }}</td>
                             <td class="text-left">
                                 <a href="#" data-toggle="modal" data-target="#modalOC{{$centro["centro"]->id}}">
-                                    $ {{ number_format($centro["ordenCompra"], 0, ".", "")  }}
+                                    $ {{ number_format($centro["ordenCompra"], 0)  }}
                                 </a>
                                 <!-- Modal -->
                                 <div class="modal fade" id="modalOC{{$centro["centro"]->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -197,7 +233,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-left">$ {{ number_format($centro["notaCreditoProforma"], 0, ".", "")  }}</td>
+                            <td class="text-left">$ {{ number_format($centro["deltaNeto"], 0)  }}</td>
+                            <td class="text-left">$ {{ number_format($centro["notaCreditoProforma"], 0)  }}</td>
                             <td class="text-left">
                                 <a href="#" data-toggle="modal" data-target="#modalNC{{$centro["centro"]->id}}">
                                     $ {{ number_format($centro["notaCreditoTributaria"], 0, ".", "")  }}
@@ -236,10 +273,12 @@
                                     </div>
                                 </div>
                             </td>
+                            <td class="text-left">$ {{ number_format($centro["deltaNC"], 0)  }}</td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+
             </div>
         </div>
     </div>

@@ -247,6 +247,13 @@ class Requerimiento extends Model
         }
     }
 
+    public function getNetoAttribute()
+    {
+        return $this->guiasDespacho->reduce(function ($carry, $item) {
+            return $carry + $item->neto;
+        });
+    }
+
     public function getEstadoPagoAttribute()
     {
         return $this->guiasDespacho->reduce(function ($carry, $item) {

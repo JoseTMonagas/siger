@@ -59,14 +59,21 @@ class ConciliacionController extends Controller
         $totalOrdenesCompra = $ordenesCompra->reduce(function ($carry, $item) {
             return $carry + $item->monto;
         });
+
+
         $notasCreditoTributaria = $cierre->notasCredito;
         $totalNotasCredito = $notasCreditoTributaria->reduce(function ($carry, $item) {
             return $carry + $item->monto;
         });
+        $totalNotasCreditoPF = 0;
+
+
         $facturasElectronica = $cierre->facturasElectronica;
         $totalFacturasElectronica = $facturasElectronica->reduce(function ($carry, $item) {
             return $carry + $item->monto;
         });
+
+        $totalNeto = 0;
 
         $conciliacion = [];
         foreach ($centros as $centro) {
@@ -92,10 +99,10 @@ class ConciliacionController extends Controller
                 ->whereIn("nota_credito_tributaria_id", $notasCreditoTributaria->modelKeys())
                 ->get();
 
-            $estadoPago = 0;
+            $neto = 0;
             $notaCreditoProforma = 0;
             foreach ($requerimientos as $requerimiento) {
-                $estadoPago += $requerimiento->estadoPago;
+                $neto += $requerimiento->neto;
                 $notaCreditoProforma += $requerimiento->notaCreditoProforma;
             }
 
@@ -109,16 +116,29 @@ class ConciliacionController extends Controller
                 $notasTributaria += $nota->pivot->monto;
             }
 
+            $totalNeto += $neto;
+            $totalNotasCreditoPF += $notaCreditoProforma;
+
+
             $conciliacion[] = [
                 "centro" => $centro,
-                "estadoPago" => $estadoPago,
-                "notaCreditoProforma" => $notaCreditoProforma,
+                "neto" => $neto,
                 "ordenCompra" => $ordenCompra,
+                "deltaNeto" => $neto - $ordenCompra,
+                "notaCreditoProforma" => $notaCreditoProforma,
                 "notaCreditoTributaria" => $notasTributaria,
+                "deltaNC" => $notaCreditoProforma - $notasTributaria,
                 "ordenes" => $ordenesCentro,
                 "notas" => $notasCentro
             ];
         }
+
+        $liquidacionDoc = $cierre->monto - $totalOrdenesCompra - $totalNotasCredito;
+        $deltaLiq = $cierre->monto - $liquidacionDoc;
+        $deltaNetoOC = $totalNeto - $totalOrdenesCompra;
+        $deltaNC = $totalNotasCreditoPF - $totalNotasCredito;
+        $cuadratura = $cierre->monto + $totalNotasCredito - $totalOrdenesCompra;
+
 
         return view("conciliacion.conciliacion")->with(compact(
             "conciliacion",
@@ -128,7 +148,14 @@ class ConciliacionController extends Controller
             "facturasElectronica",
             "totalOrdenesCompra",
             "totalNotasCredito",
-            "totalFacturasElectronica"
+            "totalFacturasElectronica",
+            "deltaNetoOC",
+            "deltaNC",
+            "cuadratura",
+            "liquidacionDoc",
+            "totalNeto",
+            "totalNotasCreditoPF",
+            "deltaLiq"
         ));
     }
 }
