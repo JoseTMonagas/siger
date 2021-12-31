@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Cierre;
 use App\Empresa;
+use App\Exports\ArrayExport;
 use App\OrdenCompra;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrdenCompraController extends Controller
 {
@@ -186,5 +188,27 @@ class OrdenCompraController extends Controller
         $ordenCompra->delete();
 
         return back();
+    }
+
+    /**
+     * Generate excel file with resource.
+     */
+    public function export(Cierre $cierre)
+    {
+        $ordenes = $cierre->ordenesCompra()->get();
+
+        $excelData = [
+            ["EDP", "{$cierre->created_at} {$cierre->id}"],
+            ["FOLIO", "MONTO", "FECHA"],
+        ];
+
+        foreach ($ordenes as $orden) {
+            $excelData[] = [
+                $orden->folio, $orden->monto, $orden->fecha
+            ];
+        }
+
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "orden-compra.xlsx");
     }
 }

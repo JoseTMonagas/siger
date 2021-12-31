@@ -382,6 +382,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get("edit/{ordenCompra}", "OrdenCompraController@edit")->name("orden_compra_edit");
         Route::post("update/{ordenCompra}", "OrdenCompraController@update")->name("orden_compra_update");
+
+        Route::post("exportar/{cierre}", "OrdenCompraController@export")->name("orden_compra_export");
     });
 
     Route::group(["prefix" => "nota_credito"], function () {
@@ -396,6 +398,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get("edit/{notaCreditoTributaria}", "NotaCreditoTributariaController@edit")->name("nota_credito_edit");
         Route::post("update/{notaCreditoTributaria}", "NotaCreditoTributariaController@update")->name("nota_credito_update");
+
+        Route::post("exportar/{cierre}", "NotaCreditoTributariaController@export")->name("nota_credito_export");
     });
 
     Route::group(["prefix" => "factura_electronica"], function () {
@@ -410,6 +414,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get("edit/{facturaElectronica}", "FacturaElectronicaController@edit")->name("factura_electronica_edit");
         Route::post("update/{facturaElectronica}", "FacturaElectronicaController@update")->name("factura_electronica_update");
+
+        Route::post("exportar/{cierre}", "FacturaElectronicaController@export")->name("factura_electronica_export");
     });
 
     Route::group(["prefix" => "conciliacion"], function () {
@@ -417,5 +423,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post("index", "ConciliacionController@filtrar")->name("conciliacion_filtrar");
 
         Route::get("{cierre}", "ConciliacionController@conciliacion")->name("conciliacion_centro");
+
+        Route::post("{cierre}", "ConciliacionController@export")->name("conciliacion_export");
     });
+
+    Route::delete("eliminar-cierre/{cierre}", "DeleteCierre")->name("eliminar_cierre");
 });

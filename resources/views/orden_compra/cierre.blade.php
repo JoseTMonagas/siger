@@ -21,6 +21,11 @@
         <div class="card-body">
             <div class="container mt-2">
                 <header class="d-flex flex-row justify-content-end my-2">
+                    <form method="POST" action="{{ route("orden_compra_export", $cierre)  }}" class="mr-3">
+                        @csrf
+
+                        <button class="btn btn-info">Exportar a Excel</button>
+                    </form>
                     <a class="btn btn-outline-success" href="{{ route("orden_compra_create", $cierre) }}">Crear OC</a>
                 </header>
                 <table class="table table-sm" id="datatable">

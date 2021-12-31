@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Cierre;
 use App\Empresa;
+use App\Exports\ArrayExport;
 use App\FacturaElectronica;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FacturaElectronicaController extends Controller
 {
@@ -186,5 +188,27 @@ class FacturaElectronicaController extends Controller
         $facturaElectronica->delete();
 
         return back();
+    }
+
+    /**
+     * Generate excel file with resource.
+     */
+    public function export(Cierre $cierre)
+    {
+        $facturas = $cierre->facturasElectronica()->get();
+
+        $excelData = [
+            ["EDP", "{$cierre->created_at} {$cierre->id}"],
+            ["FOLIO", "MONTO", "FECHA"],
+        ];
+
+        foreach ($facturas as $factura) {
+            $excelData[] = [
+                $factura->folio, $factura->monto, $factura->fecha
+            ];
+        }
+
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "factura-electronica.xlsx");
     }
 }

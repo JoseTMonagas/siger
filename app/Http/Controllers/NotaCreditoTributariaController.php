@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Cierre;
 use App\Empresa;
+use App\Exports\ArrayExport;
 use App\NotaCreditoTributaria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class NotaCreditoTributariaController extends Controller
 {
@@ -188,5 +190,27 @@ class NotaCreditoTributariaController extends Controller
         $notaCreditoTributaria->delete();
 
         return back();
+    }
+
+    /**
+     * Generate excel file with resource.
+     */
+    public function export(Cierre $cierre)
+    {
+        $notas = $cierre->notasCredito()->get();
+
+        $excelData = [
+            ["EDP", "{$cierre->created_at} {$cierre->id}"],
+            ["FOLIO", "MONTO", "FECHA"],
+        ];
+
+        foreach ($notas as $nota) {
+            $excelData[] = [
+                $nota->folio, $nota->monto, $nota->fecha
+            ];
+        }
+
+        $export = new ArrayExport($excelData);
+        return Excel::download($export, "nota-credito.xlsx");
     }
 }

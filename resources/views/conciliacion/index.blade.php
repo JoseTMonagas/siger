@@ -63,7 +63,25 @@
                             <td>{{ $cierre->desde  }} -> {{ $cierre->hasta  }}</td>
                             <td>$ {{ number_format($cierre->monto, 0) }}</td>
                             <td>
-                                <a href="{{ route('conciliacion_centro', $cierre)  }}">Seleccionar</a>
+                                <div class="d-flex flex-row">
+                                    <a href="{{ route('conciliacion_centro', $cierre)  }}">Seleccionar</a>
+
+                                    <form method="POST" action="{{ route("conciliacion_export", $cierre)  }}" class="mx-3">
+                                        @csrf
+
+                                        <button class="btn btn-info" type="submit">Excel</button>
+                                    </form>
+
+
+                                    @if ((Auth::user()->userable instanceof \App\CompassRole))
+                                    <form method="POST" action="{{ route("eliminar_cierre", $cierre)  }}">
+                                        @method("DELETE")
+                                        @csrf
+
+                                        <button class="btn btn-danger deleteBtn" type="submit">Eliminar</button>
+                                    </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -74,4 +92,13 @@
         </div>
     </div>
 </div>
+@endsection
+@section("js")
+<script type="text/javascript">
+    $(".deleteBtn").click((event) => {
+        if (!confirm("Confirme si desea eliminar este documento")) {
+            event.preventDefault();
+        };
+    });
+</script>
 @endsection
