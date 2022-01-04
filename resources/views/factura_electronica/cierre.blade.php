@@ -26,7 +26,9 @@
 
                         <button class="btn btn-info">Exportar a Excel</button>
                     </form>
+                    @if ((Auth::user()->userable instanceof \App\CompassRole))
                     <a class="btn btn-outline-success" href="{{ route("factura_electronica_create", $cierre) }}">Crear FE</a>
+                    @endif
                 </header>
                 <table class="table table-sm" id="datatable">
                     <thead>

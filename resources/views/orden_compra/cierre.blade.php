@@ -26,7 +26,9 @@
 
                         <button class="btn btn-info">Exportar a Excel</button>
                     </form>
+                    @if ((Auth::user()->userable instanceof \App\Empresa))
                     <a class="btn btn-outline-success" href="{{ route("orden_compra_create", $cierre) }}">Crear OC</a>
+                    @endif
                 </header>
                 <table class="table table-sm" id="datatable">
                     <thead>
