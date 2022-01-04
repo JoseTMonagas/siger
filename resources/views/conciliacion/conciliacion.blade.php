@@ -237,7 +237,7 @@
                             <td class="text-left">$ {{ number_format($centro["notaCreditoProforma"], 0)  }}</td>
                             <td class="text-left">
                                 <a href="#" data-toggle="modal" data-target="#modalNC{{$centro["centro"]->id}}">
-                                    $ {{ number_format($centro["notaCreditoTributaria"], 0, ".", "")  }}
+                                    $ {{ number_format($centro["notaCreditoTributaria"])  }}
                                 </a>
                                 <!-- Modal -->
                                 <div class="modal fade" id="modalNC{{$centro["centro"]->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
