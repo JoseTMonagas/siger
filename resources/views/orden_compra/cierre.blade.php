@@ -26,7 +26,7 @@
 
                         <button class="btn btn-info">Exportar a Excel</button>
                     </form>
-                    @if ((Auth::user()->userable instanceof \App\Empresa))
+                    @if (Auth::user()->userable instanceof \App\Empresa)
                     <a class="btn btn-outline-success" href="{{ route("orden_compra_create", $cierre) }}">Crear OC</a>
                     @endif
                 </header>
@@ -48,6 +48,8 @@
                             <td>
                                 <div class="d-inline-flex justify-content-around">
                                     <a href="{{ asset($orden->documento) }}" target="_BLANK">Ver PDF</a>
+
+                                    @if (Auth::user()->userable instanceof \App\Empresa)
                                     <a href="{{ route("orden_compra_edit", $orden) }}" class="btn btn-warning mx-2">Editar</a>
                                     <form method="POST" action="{{ route('orden_compra_delete', $orden)  }}">
                                         @csrf
@@ -55,6 +57,7 @@
 
                                         <button class="btn btn-danger deleteBtn" type="submit">Eliminar</button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

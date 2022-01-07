@@ -48,6 +48,7 @@
                             <td>
                                 <div class="d-inline-flex justify-content-around">
                                     <a href="{{ asset($nota->documento) }}" target="_BLANK">Ver PDF</a>
+                                    @if ((Auth::user()->userable instanceof \App\CompassRole))
                                     <a href="{{ route("nota_credito_edit", $nota) }}" class="btn btn-warning mx-2">Editar</a>
                                     <form method="POST" action="{{ route('nota_credito_delete', $nota)  }}" class="deleteForm">
                                         @csrf
@@ -55,6 +56,7 @@
 
                                         <button class="btn btn-danger deleteBtn" type="submit">Eliminar</button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
