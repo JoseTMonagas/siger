@@ -20,21 +20,26 @@
         <h3 class="card-header font-bold text-xl">{{ Auth::user()->getNombreRelacionado() }}: @isset($ordenCompra) Editar @else Crear @endisset Orden de Compra @isset($ordenCompra) {{ $ordenCompra->folio }} @endisset</h3>
         <div class="card-body">
             <div class="container mt-2">
+                @if(null !== session()->get("error"))
+                <div class="alert alert-danger">
+                    {{ session()->get("error") }}
+                </div>
+                @endif
                 <form method="POST" action="{{ $route }}" enctype="multipart/form-data">
                     @csrf
 
                     <div class="d-flex justify-content-around">
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Fecha:</label>
-                            <input required class="form-control" name="fecha" type="date" @isset($ordenCompra) value="{{ $ordenCompra->fecha }}" @endisset />
+                            <input required class="form-control" name="fecha" type="date" @if(isset($ordenCompra)) value="{{ $ordenCompra->fecha }}" @elseif(null !==(old('fecha'))) value={{ old('fecha')  }} @endif />
                         </div>
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Folio:</label>
-                            <input required class="form-control" name="folio" type="text" @isset($ordenCompra) value="{{ $ordenCompra->folio }}" @endisset />
+                            <input required class="form-control" name="folio" type="text" @if(isset($ordenCompra)) value="{{ $ordenCompra->folio }}" @elseif(null !==(old('folio'))) value={{ old('folio')  }} @endif />
                         </div>
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Monto:</label>
-                            <input required class="form-control" name="monto" type="text" @isset($ordenCompra->monto) value="{{ $ordenCompra->monto }}" @endisset />
+                            <input required class="form-control" name="monto" type="text" @if(isset($ordenCompra)) value="{{ $ordenCompra->monto }}" @elseif(null !==(old('monto'))) value={{ old('monto')  }} @endif />
                         </div>
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Documento:</label>
@@ -59,7 +64,7 @@
                                         <tr>
                                             <th>{{ $centro["nombre"]  }}</th>
                                             <td>
-                                                <input class="form-control" type="text" name="centro-{{$centro["id"]}}" @isset($centro["pivot"]) value="{{ $centro["pivot"]["monto"] }}" @endisset />
+                                                <input class="form-control" type="text" name="centro-{{$centro["id"]}}" @if(isset($centro["pivot"])) value="{{ $centro["pivot"]["monto"] }}" @elseif(null !==(old('monto'))) value={{ old("centro-".$centro["id"]) }} @endif />
                                             </td>
                                         </tr>
                                         @endforeach

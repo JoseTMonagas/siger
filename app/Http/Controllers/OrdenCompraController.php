@@ -81,6 +81,20 @@ class OrdenCompraController extends Controller
     {
         $form = $request->input();
 
+        $total = 0;
+        foreach ($form as $input => $value) {
+            if (str_contains($input, "centro-") && floatval($value) > 0) {
+                $monto = floatval($value);
+
+                $total += $monto;
+            }
+        }
+
+        if ($total <> floatval($form["monto"])) {
+            $error = "La suma del monto de los centros no es igual al monto del documento.";
+            return redirect()->back()->withInput()->with("error", $error);
+        }
+
         $path = "";
         if ($request->hasFile("documento") && $request->file("documento")->isValid()) {
             $path = $request->file("documento")->store(
@@ -140,6 +154,20 @@ class OrdenCompraController extends Controller
     {
         $form = $request->input();
         $cierre = $ordenCompra->cierre;
+
+        $total = 0;
+        foreach ($form as $input => $value) {
+            if (str_contains($input, "centro-") && floatval($value) > 0) {
+                $monto = floatval($value);
+
+                $total += $monto;
+            }
+        }
+
+        if ($total <> floatval($form["monto"])) {
+            $error = "La suma del monto de los centros no es igual al monto del documento.";
+            return redirect()->back()->withInput()->with("error", $error);
+        }
 
         $attributes = [
             "fecha" => $form["fecha"],

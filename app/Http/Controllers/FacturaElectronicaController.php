@@ -81,6 +81,21 @@ class FacturaElectronicaController extends Controller
     {
         $form = $request->input();
 
+        $total = 0;
+        foreach ($form as $input => $value) {
+            if (str_contains($input, "orden-") && floatval($value) > 0) {
+                $monto = floatval($value);
+
+                $total += $monto;
+            }
+        }
+
+        if ($total <> floatval($form["monto"])) {
+            $error = "La suma del monto de las OCs no es igual al monto del documento.";
+            return redirect()->back()->withInput()->with("error", $error);
+        }
+
+
         $path = "";
         if ($request->hasFile("documento") && $request->file("documento")->isValid()) {
             $path = $request->file("documento")->store(
@@ -140,6 +155,20 @@ class FacturaElectronicaController extends Controller
     {
         $form = $request->input();
         $cierre = $facturaElectronica->cierre;
+
+        $total = 0;
+        foreach ($form as $input => $value) {
+            if (str_contains($input, "orden-") && floatval($value) > 0) {
+                $monto = floatval($value);
+
+                $total += $monto;
+            }
+        }
+
+        if ($total <> floatval($form["monto"])) {
+            $error = "La suma del monto de las OCs no es igual al monto del documento.";
+            return redirect()->back()->withInput()->with("error", $error);
+        }
 
         $attributes = [
             "fecha" => $form["fecha"],
