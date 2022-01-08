@@ -47,7 +47,10 @@
                     </div>
 
                     <button type="submit" name="closed" value="0" class="btn btn-primary my-5">Exportar a Excel</button>
+
+                    @if ((Auth::user()->userable instanceof \App\CompassRole))
                     <button type="submit" name="closed" value="1" class="btn btn-primary my-5">Generar Cierrre</button>
+                    @endif
                 </form>
 
             </div>
