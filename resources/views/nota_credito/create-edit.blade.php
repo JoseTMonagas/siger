@@ -31,15 +31,15 @@
                     <div class="d-flex justify-content-around">
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Fecha:</label>
-                            <input required class="form-control" name="fecha" type="date" @if(isset($notacreditotributaria)) value="{{ $notacreditotributaria->fecha }}" @elseif(null !==(old('fecha'))) value={{ old('fecha')  }} @endif />
+                            <input required class="form-control" name="fecha" type="date" @if(isset($notaCreditoTributaria)) value="{{ $notaCreditoTributaria->fecha }}" @elseif(null !==(old('fecha'))) value={{ old('fecha')  }} @endif />
                         </div>
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Folio:</label>
-                            <input required class="form-control" name="folio" type="text" @if(isset($notacreditotributaria)) value="{{ $notacreditotributaria->folio }}" @elseif(null !==(old('folio'))) value={{ old('folio')  }} @endif />
+                            <input required class="form-control" name="folio" type="text" @if(isset($notaCreditoTributaria)) value="{{ $notaCreditoTributaria->folio }}" @elseif(null !==(old('folio'))) value={{ old('folio')  }} @endif />
                         </div>
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Monto:</label>
-                            <input required class="form-control" name="monto" type="text" @if(isset($notacreditotributaria)) value="{{ $notacreditotributaria->monto }}" @elseif(null !==(old('monto'))) value={{ old('monto')  }} @endif />
+                            <input required class="form-control" name="monto" type="text" @if(isset($notaCreditoTributaria)) value="{{ $notaCreditoTributaria->monto }}" @elseif(null !==(old('monto'))) value={{ old('monto')  }} @endif />
                         </div>
                         <div class="d-inline-flex flex-column form-group">
                             <label for="">Documento:</label>
