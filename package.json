@@ -40,7 +40,7 @@
     "font-awesome": "^4.7.0",
     "jszip": "^3.5.0",
     "pdfmake": "^0.1.67",
-    "read-excel-file": "^5.2.14",
+    "read-excel-file": "^5.5.0",
     "sweetalert2": "^9.17.1",
     "tailwindcss": "^1.5.2",
     "vue-chartjs": "^3.5.0",
